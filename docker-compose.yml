@@ -1,0 +1,69 @@
+version: '2'
+
+services:
+
+### Applications Code Container #############################
+
+    aplicaciones:
+        image: tianon/true
+        volumes:
+            - ../:/var/www
+#            - ../landing-viewer/:/var/www/landing-viewer
+#            - ../demo-ci/:/var/www/demo-ci
+#            - ../demo-ci-dev/:/var/www/demo-ci-dev
+#            - ../demo-ci-pre/:/var/www/demo-ci-pre
+
+
+    workspace:
+        build:
+            context: ./server
+            args:
+                - INSTALL_XDEBUG=true
+                - INSTALL_MONGO=false
+                - INSTALL_NODE=true
+                - COMPOSER_GLOBAL_INSTALL=false
+                - INSTALL_WORKSPACE_SSH=false
+                - INSTALL_LARAVEL_ENVOY=false
+                - INSTALL_LINUXBREW=false
+                - PUID=1000
+                - PGID=1000
+                - NODE_VERSION=stable
+                - YARN_VERSION=latest
+                - TZ=UTC
+        volumes_from:
+            - aplicaciones
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            - "dockerhost:10.0.75.1"
+        ports:
+           - "2222:22"
+        tty: true
+
+
+    mysql:
+        build:
+            context: ./mysql
+            args:
+                - MYSQL_DATABASE=homestead
+                - MYSQL_USER=homestead
+                - MYSQL_PASSWORD=secret
+                - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - mysql:/var/lib/mysql
+        ports:
+            - "3306:3306"
+
+    apache2:
+        build:
+            context: ./apache2
+            args:
+                - PHP_SOCKET=php-fpm:9000
+        volumes_from:
+            - applications
+        volumes:
+            - ./logs/apache2:/var/log/apache2
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - php-fpm
