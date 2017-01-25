@@ -7,31 +7,32 @@ services:
     aplicaciones:
         image: tianon/true
         volumes:
-            - ../:/var/www
+            - ./web:/var/www
 #            - ../landing-viewer/:/var/www/landing-viewer
 #            - ../demo-ci/:/var/www/demo-ci
 #            - ../demo-ci-dev/:/var/www/demo-ci-dev
 #            - ../demo-ci-pre/:/var/www/demo-ci-pre
 
 
-    workspace:
+    servidor:
         build:
             context: ./server
             args:
                 - INSTALL_XDEBUG=true
-                - INSTALL_MONGO=false
-                - INSTALL_NODE=true
+                - INSTALL_NODE=false
                 - COMPOSER_GLOBAL_INSTALL=false
                 - INSTALL_WORKSPACE_SSH=false
-                - INSTALL_LARAVEL_ENVOY=false
-                - INSTALL_LINUXBREW=false
+#                - INSTALL_LARAVEL_ENVOY=false
                 - PUID=1000
                 - PGID=1000
                 - NODE_VERSION=stable
-                - YARN_VERSION=latest
                 - TZ=UTC
         volumes_from:
             - aplicaciones
+        links:
+            - mysql
+            - apache2
+            - php
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             - "dockerhost:10.0.75.1"
@@ -59,11 +60,26 @@ services:
             args:
                 - PHP_SOCKET=php-fpm:9000
         volumes_from:
-            - applications
+            - aplicaciones
         volumes:
             - ./logs/apache2:/var/log/apache2
         ports:
             - "80:80"
             - "443:443"
         links:
-            - php-fpm
+#            - workspace
+            - php
+
+    php:
+        image: nmcteam/php56
+        volumes:
+#            - ./src/php-fpm.conf:/etc/php5/fpm/php-fpm.conf
+            - ./src:/var/www
+        links:
+            - mysql
+
+
+
+volumes:
+    mysql:
+        driver: "local"

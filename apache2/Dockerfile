@@ -10,31 +10,48 @@ FROM ubuntu:17.04
 # Maintainer
 MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 
-# Install Apache2
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-    && apt-get install -y --no-install-recommends apache2 \
+# Update the package repository
+RUN apt-get update -y && apt-get upgrade -y
+
+
+# Install base system
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl nano apache2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Custom apache2 configuration
-COPY conf.d/* /etc/apache2/conf-enabled/
+ADD config/000-docker.conf /etc/apache2/sites-available
+RUN a2dissite 000-default
+RUN a2ensite 000-docker
+RUN apache2ctl restart
 
 # Remove default VirtualHost
-RUN rm -rf /etc/apache2/sites-enabled/000-default.conf /var/www/html
+#RUN rm -rf /etc/apache2/sites-enabled/000-default.conf /var/www/html
 
 # Enable rewrite module
 RUN a2enmod rewrite
 
 # Configure Apache2
-ENV APACHE_RUN_USER     www-data
-ENV APACHE_RUN_GROUP    www-data
-ENV APACHE_LOG_DIR      /var/log/apache2
-env APACHE_PID_FILE     /var/run/apache2.pid
-env APACHE_RUN_DIR      /var/run/apache2
-env APACHE_LOCK_DIR     /var/lock/apache2
-env APACHE_LOG_DIR      /var/log/apache2
+ENV TERM xterm
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_PID_FILE /var/run/apache2.pid
+ENV APACHE_RUN_DIR /var/run/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+ENV APACHE_SERVERADMIN developer@localhost
+ENV APACHE_SERVERNAME localhost
+ENV APACHE_SERVERALIAS docker.localhost
+ENV APACHE_DOCUMENTROOT /var/www
+
+
 
 # Expose ourselves
 EXPOSE 80 443
 
 # Run!
-ENTRYPOINT [ "/usr/sbin/apache2", "-DFOREGROUND" ]
+ENTRYPOINT [ "/usr/sbin/apache2ctl", "-D FOREGROUND" ]
+
+#ADD scripts/start.sh /start.sh
+#RUN chmod 0755 /start.sh
+#CMD ["bash", "start.sh"]
