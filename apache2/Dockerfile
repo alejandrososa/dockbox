@@ -6,6 +6,7 @@
 
 # Pull base image.
 FROM ubuntu:17.04
+#FROM webdevops/apache:ubuntu-16.04
 
 # Maintainer
 MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
@@ -28,7 +29,7 @@ RUN apache2ctl restart
 #RUN rm -rf /etc/apache2/sites-enabled/000-default.conf /var/www/html
 
 # Enable rewrite module
-RUN a2enmod rewrite
+#RUN a2enmod rewrite
 
 # Configure Apache2
 ENV TERM xterm
@@ -44,14 +45,25 @@ ENV APACHE_SERVERNAME localhost
 ENV APACHE_SERVERALIAS docker.localhost
 ENV APACHE_DOCUMENTROOT /var/www
 
+ARG PHP_SOCKET=php-fpm:9000
+ENV WEB_PHP_SOCKET=$PHP_SOCKET
+WORKDIR /var/www
 
-
-# Expose ourselves
 EXPOSE 80 443
 
-# Run!
+WORKDIR /var/www
+
+#ENTRYPOINT ["/opt/docker/bin/entrypoint.sh"]
+
 ENTRYPOINT [ "/usr/sbin/apache2ctl", "-D FOREGROUND" ]
 
+#CMD ["supervisord"]
+
+# Expose ourselves
+#EXPOSE 80 443
+
+# Run!
+#ENTRYPOINT [ "/usr/sbin/apache2ctl", "-D FOREGROUND" ]
 #ADD scripts/start.sh /start.sh
 #RUN chmod 0755 /start.sh
 #CMD ["bash", "start.sh"]

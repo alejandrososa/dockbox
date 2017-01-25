@@ -29,15 +29,14 @@ services:
                 - TZ=UTC
         volumes_from:
             - aplicaciones
-        links:
-            - mysql
-            - apache2
-            - php
+#        links:
+#            - mysql:mysql
+#            - apache2:apache2
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             - "dockerhost:10.0.75.1"
         ports:
-           - "2222:22"
+           - "2224:22"
         tty: true
 
 
@@ -45,14 +44,14 @@ services:
         build:
             context: ./mysql
             args:
-                - MYSQL_DATABASE=homestead
-                - MYSQL_USER=homestead
-                - MYSQL_PASSWORD=secret
+                - MYSQL_DATABASE=demo
+                - MYSQL_USER=dev
+                - MYSQL_PASSWORD=123456
                 - MYSQL_ROOT_PASSWORD=root
         volumes:
             - mysql:/var/lib/mysql
         ports:
-            - "3306:3306"
+            - "3307:3306"
 
     apache2:
         build:
@@ -64,19 +63,48 @@ services:
         volumes:
             - ./logs/apache2:/var/log/apache2
         ports:
-            - "80:80"
-            - "443:443"
+            - "8081:80"
+            - "444:443"
         links:
-#            - workspace
             - php
 
     php:
-        image: nmcteam/php56
-        volumes:
-#            - ./src/php-fpm.conf:/etc/php5/fpm/php-fpm.conf
-            - ./src:/var/www
+        build:
+            context: ./php
+            args:
+                - INSTALL_XDEBUG=true
+                - INSTALL_SOAP=true
+                - INSTALL_MONGO=true
+                - INSTALL_ZIP_ARCHIVE=false
+                - INSTALL_BCMATH=false
+                - INSTALL_MEMCACHED=true
+                - INSTALL_OPCACHE=true
+                - INSTALL_AEROSPIKE_EXTENSION=false
+                - CODEIGNITER=false
+            dockerfile: Dockerfile-70
+        volumes_from:
+            - aplicaciones
+        expose:
+            - "9000"
         links:
-            - mysql
+            - servidor
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            - "dockerhost:10.0.75.1"
+        environment:
+            # IMPORTANT: Set the Remote Interpreter entry matching name to `laravel`
+            - PHP_IDE_CONFIG=serverName=laravel
+
+#    php:
+#        image: nmcteam/php56
+#        volumes:
+##            - ./src/php-fpm.conf:/etc/php5/fpm/php-fpm.conf
+#            - ./src:/var/www
+#        links:
+#            - mysql:mysql
+#
+#        ports:
+#            - "9000:9000"
 
 
 
