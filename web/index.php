@@ -5,6 +5,8 @@
  * Fecha: 24/1/17 - 21:43
  */
 
+echo 'contenedor servidor';
+
 // Muestra toda la información, por defecto INFO_ALL
 phpinfo();
 

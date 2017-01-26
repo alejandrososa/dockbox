@@ -40,3 +40,12 @@ AH00558: apache2: Could not reliably determine the server's fully qualified doma
 [Wed Jan 25 17:10:52.465133 2017] [core:warn] [pid 8] AH00098: pid file /var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
 [Wed Jan 25 17:10:52.466844 2017] [mpm_prefork:notice] [pid 8] AH00163: Apache/2.4.23 (Ubuntu) configured -- resuming normal operations
 [Wed Jan 25 17:10:52.466869 2017] [core:notice] [pid 8] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.18.0.4. Set the 'ServerName' directive globally to suppress this message
+[Wed Jan 25 22:27:34.500228 2017] [mpm_event:notice] [pid 7:tid 139954565295616] AH00489: Apache/2.4.23 (Ubuntu) configured -- resuming normal operations
+[Wed Jan 25 22:27:34.502819 2017] [core:notice] [pid 7:tid 139954565295616] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.18.0.5. Set the 'ServerName' directive globally to suppress this message
+[Wed Jan 25 22:29:39.991983 2017] [mpm_event:notice] [pid 7:tid 139944551587328] AH00489: Apache/2.4.23 (Ubuntu) configured -- resuming normal operations
+[Wed Jan 25 22:29:39.992605 2017] [core:notice] [pid 7:tid 139944551587328] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.18.0.5. Set the 'ServerName' directive globally to suppress this message
+[Wed Jan 25 22:32:50.593546 2017] [mpm_event:notice] [pid 6:tid 139636351938048] AH00489: Apache/2.4.23 (Ubuntu) configured -- resuming normal operations
+[Wed Jan 25 22:32:50.594222 2017] [core:notice] [pid 6:tid 139636351938048] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
