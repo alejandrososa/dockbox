@@ -33,8 +33,14 @@ services:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             # OBTENER CON: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
             - "dockerhost:172.19.0.2"
+        environment:
+            XDEBUG_CONFIG: "remote_host=192.168.65.1"
+            PHP_IDE_CONFIG: "serverName=Desarrollo"
+#        networks:
+#            app_net:
+#                ipv4_address: 172.16.238.10
         ports:
-           - "2224:22"
+           - "2222:22"
         tty: true
 
 
@@ -53,6 +59,9 @@ services:
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             - "dockerhost:172.19.0.3"
+#        networks:
+#            app_net:
+#              ipv4_address: 172.16.238.12
 
     php:
         build:
@@ -76,6 +85,9 @@ services:
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             - "dockerhost:172.19.0.4"
+#        networks:
+#            app_net:
+#                ipv4_address: 172.16.238.11
         ports:
           - "80:80"
           - "443:443"
@@ -86,3 +98,18 @@ services:
 volumes:
     mysql:
         driver: "local"
+
+
+################################################################################
+# NETWORK
+################################################################################
+#networks:
+#  app_net:
+#    driver: bridge
+#    driver_opts:
+#      com.docker.network.enable_ipv6: "false"
+#    ipam:
+#      driver: default
+#      config:
+#      - subnet: 172.16.238.0/24
+#        gateway: 172.16.238.1
