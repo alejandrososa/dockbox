@@ -19,23 +19,20 @@ services:
             context: ./server
             args:
                 - INSTALL_XDEBUG=true
-                - INSTALL_NODE=false
-                - COMPOSER_GLOBAL_INSTALL=false
-                - INSTALL_WORKSPACE_SSH=false
-#                - INSTALL_LARAVEL_ENVOY=false
+                - INSTALL_NODE=true
+                - COMPOSER_GLOBAL_INSTALL=true
+                - INSTALL_WORKSPACE_SSH=true
                 - PUID=1000
                 - PGID=1000
                 - NODE_VERSION=stable
                 - TZ=UTC
+#                - API_TOKEN_COMPOSER=
         volumes_from:
             - aplicaciones
-#        links:
-#                - php
-#            - mysql:mysql
-#            - apache2:apache2
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:10.0.75.1"
+            # OBTENER CON: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+            - "dockerhost:172.19.0.2"
         ports:
            - "2224:22"
         tty: true
@@ -53,21 +50,9 @@ services:
             - mysql:/var/lib/mysql
         ports:
             - "3306:3306"
-
-#    apache2:
-#        build:
-#            context: ./apache2
-#            args:
-#                - PHP_SOCKET=php-fpm:9000
-#        volumes_from:
-#            - aplicaciones
-#        volumes:
-#            - ./logs/apache2:/var/log/apache2
-#        ports:
-#            - "80:80"
-#            - "443:443"
-#        links:
-#            - php
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            - "dockerhost:172.19.0.3"
 
     php:
         build:
@@ -90,53 +75,12 @@ services:
             - servidor
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:10.0.75.1"
+            - "dockerhost:172.19.0.4"
         ports:
           - "80:80"
           - "443:443"
-#        volumes:
-#          - ./php/www:/var/www
         links:
           - mysql
-
-#    php:
-#        build:
-#            context: ./php
-#            args:
-#                - INSTALL_XDEBUG=true
-#                - INSTALL_SOAP=true
-#                - INSTALL_MONGO=true
-#                - INSTALL_ZIP_ARCHIVE=false
-#                - INSTALL_BCMATH=false
-#                - INSTALL_MEMCACHED=true
-#                - INSTALL_OPCACHE=true
-#                - INSTALL_AEROSPIKE_EXTENSION=false
-#                - CODEIGNITER=false
-#            dockerfile: Dockerfile-70
-#        volumes_from:
-#            - aplicaciones
-#        expose:
-#            - "9000"
-##        links:
-##            - servidor
-#        extra_hosts:
-#            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-#            - "dockerhost:10.0.75.1"
-#        environment:
-#            # IMPORTANT: Set the Remote Interpreter entry matching name to `laravel`
-#            - PHP_IDE_CONFIG=serverName=laravel
-
-#    php:
-#        image: nmcteam/php56
-#        volumes:
-##            - ./src/php-fpm.conf:/etc/php5/fpm/php-fpm.conf
-#            - ./src:/var/www
-#        links:
-#            - mysql:mysql
-#
-#        ports:
-#            - "9000:9000"
-
 
 
 volumes:

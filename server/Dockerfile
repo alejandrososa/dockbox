@@ -1,7 +1,78 @@
-FROM ubuntu:17.04
+FROM phusion/baseimage:latest
 
 # Maintainer
 MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
+
+
+RUN DEBIAN_FRONTEND=noninteractive
+RUN locale-gen en_US.UTF-8
+
+ENV LANGUAGE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LC_CTYPE=UTF-8
+ENV LANG=en_US.UTF-8
+ENV TERM xterm
+
+# Add the "PHP 7" ppa
+RUN apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:ondrej/php
+
+#Net tools
+#RUN apt-get install -y net-tools
+
+#
+#--------------------------------------------------------------------------
+# Software's Installation
+#--------------------------------------------------------------------------
+#
+
+# Install "PHP Extentions", "libraries", "Software's"
+RUN apt-get update && \
+    apt-get install -y --force-yes \
+        php7.0-cli \
+        php7.0-common \
+        php7.0-curl \
+        php7.0-json \
+        php7.0-xml \
+        php7.0-mbstring \
+        php7.0-mcrypt \
+        php7.0-mysql \
+        php7.0-pgsql \
+        php7.0-sqlite \
+        php7.0-sqlite3 \
+        php7.0-zip \
+        php7.0-bcmath \
+        php7.0-memcached \
+        php7.0-gd \
+        php7.0-dev \
+        pkg-config \
+        libcurl4-openssl-dev \
+        libedit-dev \
+        libssl-dev \
+        libxml2-dev \
+        xz-utils \
+        libsqlite3-dev \
+        sqlite3 \
+        git \
+        curl \
+        vim \
+        nano \
+        postgresql-client \
+    && apt-get clean
+
+#####################################
+# Composer:
+#####################################
+
+# Install composer and add its bin to the PATH.
+RUN curl -s http://getcomposer.org/installer | php && \
+    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
+    mv composer.phar /usr/local/bin/composer
+
+# Source the bash
+RUN . ~/.bashrc
+
+
 
 #####################################
 # Non-Root User:
@@ -84,6 +155,8 @@ COPY ./xdebug.ini /etc/php/7.0/cli/conf.d/xdebug.ini
 ARG INSTALL_WORKSPACE_SSH=false
 ENV INSTALL_WORKSPACE_SSH ${INSTALL_WORKSPACE_SSH}
 
+#ADD desarrollador_rsa /tmp/id_rsa
+#ADD desarrollador_rsa.pub /tmp/id_rsa.pub
 ADD insecure_id_rsa /tmp/id_rsa
 ADD insecure_id_rsa.pub /tmp/id_rsa.pub
 
@@ -135,6 +208,18 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
     echo 'export NVM_DIR="/home/desarrollador/.nvm"' >> ~/.bashrc && \
     echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc \
 ;fi
+
+
+#####################################
+# Non-root user : PHPUnit path
+#####################################
+
+# add ./vendor/bin to non-root user's bashrc (needed for phpunit)
+USER desarrollador
+
+RUN echo "" >> ~/.bashrc && \
+    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
+#RUN source ~/.bashrc
 
 #
 #--------------------------------------------------------------------------
