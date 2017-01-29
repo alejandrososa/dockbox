@@ -25,9 +25,10 @@ RUN apt-get install nano
 #####################################
 ENV TERM xterm
 
-ADD ./sites/*.conf /etc/apache2/sites-available
+ADD ./sites/*.conf /etc/apache2/sites-available/
 RUN a2dissite 000-default
 RUN a2ensite 000-docker
+RUN a2ensite ofertaskilaravel
 RUN apache2ctl restart
 
 ENV APACHE_RUN_USER www-data
@@ -189,7 +190,7 @@ RUN if [ ${CODEIGNITER} = true ]; then \
 # Frameworks:
 #####################################
 
-RUN composer global require "laravel/installer"
+#RUN composer global require "laravel/installer"
 
 #
 #--------------------------------------------------------------------------
