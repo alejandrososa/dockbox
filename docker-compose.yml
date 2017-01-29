@@ -2,18 +2,28 @@ version: '2'
 
 services:
 
-### Applications Code Container #############################
+###
+### APLICACIONES
+###
 
     aplicaciones:
         image: tianon/true
         volumes:
-            - ./web:/var/www
-#            - ../landing-viewer/:/var/www/landing-viewer
-#            - ../demo-ci/:/var/www/demo-ci
-#            - ../demo-ci-dev/:/var/www/demo-ci-dev
-#            - ../demo-ci-pre/:/var/www/demo-ci-pre
+            # Forma A: directorio dentro de dockbox
+            # - ./web:/var/www
+
+            # Forma B: dockbox dentro de un proyecto
+            #- ../:/var/www
+
+            # Forma C: proyectos al mismo nivel de dockbox
+            - ../demo-ci/:/var/www/demo-ci
+            - ../demo-ci-dev/:/var/www/demo-ci-dev
+            - ../demo-ci-pre/:/var/www/demo-ci-pre
 
 
+###
+### SERVIDOR UBUNTU 16.04
+###
     servidor:
         build:
             context: ./server
@@ -26,7 +36,7 @@ services:
                 - PGID=1000
                 - NODE_VERSION=stable
                 - TZ=UTC
-#                - API_TOKEN_COMPOSER=
+                #- API_TOKEN_COMPOSER=
         volumes_from:
             - aplicaciones
         extra_hosts:
@@ -34,16 +44,49 @@ services:
             # OBTENER CON: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
             - "dockerhost:172.19.0.2"
         environment:
-            XDEBUG_CONFIG: "remote_host=192.168.65.1"
             PHP_IDE_CONFIG: "serverName=Desarrollo"
-#        networks:
-#            app_net:
-#                ipv4_address: 172.16.238.10
         ports:
            - "2222:22"
         tty: true
 
 
+###
+### PHP 7.0 con APACHE
+###
+    php:
+        build:
+            context: ./php
+            args:
+                - INSTALL_XDEBUG=true
+                - INSTALL_SOAP=true
+                - INSTALL_MONGO=TRUE
+                - INSTALL_ZIP_ARCHIVE=true
+                - INSTALL_BCMATH=false
+                - INSTALL_PHPREDIS=fTRUE
+                - INSTALL_MEMCACHED=false
+                - INSTALL_OPCACHE=true
+                - INSTALL_AEROSPIKE_EXTENSION=false
+            dockerfile: Dockerfile
+        volumes_from:
+            - aplicaciones
+        volumes:
+            - ./log/apache2:/var/log/apache2
+        expose:
+            - "9000"
+        links:
+            - servidor
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            - "dockerhost:172.19.0.4"
+        ports:
+          - "80:80"
+          - "443:443"
+        links:
+          - mysql
+
+###
+### MYSQL
+###
     mysql:
         build:
             context: ./mysql
@@ -54,62 +97,145 @@ services:
                 - MYSQL_ROOT_PASSWORD=root
         volumes:
             - mysql:/var/lib/mysql
+            - ./log/mysql:/var/lib/mysql
         ports:
             - "3306:3306"
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             - "dockerhost:172.19.0.3"
-#        networks:
-#            app_net:
-#              ipv4_address: 172.16.238.12
 
-    php:
-        build:
-            context: ./php
-            args:
-                - INSTALL_XDEBUG=true
-                - INSTALL_SOAP=true
-                - INSTALL_MONGO=false
-                - INSTALL_ZIP_ARCHIVE=true
-                - INSTALL_BCMATH=false
-                - INSTALL_MEMCACHED=false
-                - INSTALL_OPCACHE=true
-                - INSTALL_AEROSPIKE_EXTENSION=false
-            dockerfile: Dockerfile
-        volumes_from:
-            - aplicaciones
-        expose:
-            - "9000"
-        links:
-            - servidor
-        extra_hosts:
-            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.19.0.4"
-#        networks:
-#            app_net:
-#                ipv4_address: 172.16.238.11
+
+###
+### POSTGRESQL
+###
+    postgres:
+        build: ./postgres
+        volumes:
+            - postgres:/var/lib/postgresql/data
         ports:
-          - "80:80"
-          - "443:443"
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: demo
+            POSTGRES_USER: dev
+            POSTGRES_PASSWORD: 123456
+
+
+###
+### POSTGRESQL PostGis
+###
+    postgres-postgis:
+        build: ./postgres-postgis
+        volumes:
+            - postgres:/var/lib/postgresql/data
+        ports:
+            - "5433:5432"
+        environment:
+            POSTGRES_DB: demo
+            POSTGRES_USER: dev
+            POSTGRES_PASSWORD: 123456
+
+
+###
+### MARIADB
+###
+    mariadb:
+        build: ./mariadb
+        volumes:
+            - mariadb:/var/lib/mysql
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_DATABASE: demo
+            MYSQL_USER: dev
+            MYSQL_PASSWORD: 123456
+            MYSQL_ROOT_PASSWORD: root
+
+
+###
+### MONGODB
+###
+    mongo:
+        build: ./mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo:/data/db
+
+
+###
+### PHPMYADMIN
+###
+    phpmyadmin:
+        build: ./phpmyadmin
+        environment:
+            PMA_ARBITRARY: 1
+            MYSQL_USER: dev
+            MYSQL_PASSWORD: 123456
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "8081:80"
         links:
-          - mysql
+            # for mysql container
+            - "mysql:db"
+            # for mariadb container
+            # - "mariadb:db"
+
+
+###
+### PGADMIN
+###
+    pgadmin:
+        build: ./pgadmin
+        ports:
+            - "5050:5050"
+        links:
+            - postgres
+
+
+###
+### REDIS
+###
+    redis:
+        build: ./redis
+        volumes:
+            - redis:/data
+        ports:
+            - "6379:6379"
+
+
+###
+### ELASTICSEARCH
+###
+    elasticsearch:
+        build: ./elasticsearch
+        volumes:
+            - elasticsearch-data:/usr/share/elasticsearch/data
+            - elasticsearch-plugins:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        links:
+            - php
 
 
 volumes:
     mysql:
         driver: "local"
-
-
-################################################################################
-# NETWORK
-################################################################################
-#networks:
-#  app_net:
-#    driver: bridge
-#    driver_opts:
-#      com.docker.network.enable_ipv6: "false"
-#    ipam:
-#      driver: default
-#      config:
-#      - subnet: 172.16.238.0/24
-#        gateway: 172.16.238.1
+    postgres:
+        driver: "local"
+    memcached:
+        driver: "local"
+    redis:
+        driver: "local"
+    mariadb:
+        driver: "local"
+    mongo:
+        driver: "local"
+    phpmyadmin:
+        driver: "local"
+    elasticsearch-data:
+        driver: "local"
+    elasticsearch-plugins:
+        driver: "local"
+    sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
+        driver: "local"

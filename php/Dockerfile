@@ -25,7 +25,7 @@ RUN apt-get install nano
 #####################################
 ENV TERM xterm
 
-ADD ./sites/000-docker.conf /etc/apache2/sites-available
+ADD ./sites/*.conf /etc/apache2/sites-available
 RUN a2dissite 000-default
 RUN a2ensite 000-docker
 RUN apache2ctl restart

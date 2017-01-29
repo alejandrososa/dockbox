@@ -1,3 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
-/logs/*
+/.idea
+/log/*
 /server/ssh/ssh-key
+/web/
