@@ -184,6 +184,13 @@ RUN if [ ${CODEIGNITER} = true ]; then \
      docker-php-ext-install tokenizer \
 ;fi
 
+
+#####################################
+# Frameworks:
+#####################################
+
+RUN composer global require "laravel/installer"
+
 #
 #--------------------------------------------------------------------------
 # Final Touch
