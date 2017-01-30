@@ -25,7 +25,7 @@ RUN apt-get install nano
 #####################################
 ENV TERM xterm
 
-ADD ./sites/*.conf /etc/apache2/sites-available
+ADD ./sites/*.conf /etc/apache2/sites-available/
 RUN a2dissite 000-default
 RUN a2ensite 000-docker
 RUN a2enmod rewrite
@@ -184,6 +184,13 @@ RUN if [ ${CODEIGNITER} = true ]; then \
      docker-php-ext-install mysqli && \
      docker-php-ext-install tokenizer \
 ;fi
+
+
+#####################################
+# Frameworks:
+#####################################
+
+#RUN composer global require "laravel/installer"
 
 #
 #--------------------------------------------------------------------------
