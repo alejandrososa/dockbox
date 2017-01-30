@@ -58,7 +58,17 @@ RUN apt-get update && \
         vim \
         nano \
         postgresql-client \
+        git-core \
+        zlib1g-dev \
+        build-essential \
+        libreadline-dev \
+        libyaml-dev \
+        libxslt1-dev \
+        python-software-properties \
+        libffi-dev \
+        nodejs \
     && apt-get clean
+
 
 #####################################
 # Composer:
@@ -191,6 +201,33 @@ USER desarrollador
 #    && chmod 400 /root/.ssh/id_rsa \
 #    && service ssh restart
 #;fi
+
+
+
+#####################################
+# Ruby:
+#####################################
+#USER desarrollador
+#
+#RUN cd && \
+#    git clone git://github.com/sstephenson/rbenv.git .rbenv && \
+#    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile && \
+#    echo 'eval "$(rbenv init -)"' >> ~/.bash_profile && \
+#    git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build && \
+#    echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bash_profile && \
+#    source ~/.bash_profile
+#
+#USER root
+#
+#RUN cd && \
+#    git clone git://github.com/sstephenson/rbenv.git .rbenv && \
+#    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile && \
+#    echo 'eval "$(rbenv init -)"' >> ~/.bash_profile && \
+#    git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build && \
+#    echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bash_profile && \
+#    source ~/.bash_profile
+
+
 
 
 USER desarrollador

@@ -16,7 +16,6 @@ services:
             #- ../:/var/www
 
             # Forma C: proyectos al mismo nivel de dockbox
-            - ../ofertaski-laravel/:/var/www/ofertaski-laravel
             - ../demo-ci/:/var/www/demo-ci
             - ../demo-ci-dev/:/var/www/demo-ci-dev
             - ../demo-ci-pre/:/var/www/demo-ci-pre
