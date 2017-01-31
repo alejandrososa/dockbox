@@ -4,4 +4,5 @@
 /log/*
 /server/ssh/ssh-key
 /web/
-/php/sites/ofertaskilaravel.conf
+/php/sites/*
+!/php/sites/000-docker.conf

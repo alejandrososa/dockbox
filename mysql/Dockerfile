@@ -6,9 +6,9 @@ ADD startup /etc/mysql/startup
 
 RUN chown -R mysql:root /var/lib/mysql/
 
-ARG MYSQL_DATABASE=homestead
-ARG MYSQL_USER=homestead
-ARG MYSQL_PASSWORD=secret
+ARG MYSQL_DATABASE=demo
+ARG MYSQL_USER=dev
+ARG MYSQL_PASSWORD=123456
 ARG MYSQL_ROOT_PASSWORD=root
 
 ENV MYSQL_DATABASE=$MYSQL_DATABASE
