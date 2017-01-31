@@ -17,6 +17,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     --enable-gd-native-ttf \
     && docker-php-ext-install -j$(nproc) gd
 
+#drivers
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Install Postgre PDO
+RUN apt-get install -y libpq-dev \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
+
 RUN apt-get install nano
 
 
