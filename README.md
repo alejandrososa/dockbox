@@ -57,11 +57,92 @@ Configure Docker to start on boot
 
     sudo systemctl enable docker
 
+## Instalación
+
+Elije la configuración que más se ajuste a tus necesidades.
+
+**A) el programa de instalación a un proyecto concreto:**
+
+(En caso de que quiera un ambiente acoplable para cada proyecto)
+
+A.1) Entorno de instalación en proyecto existente:**
+
+(En caso de que ya tiene un proyecto y desea configurar un entorno para ejecutarlo)
+
+1 - Clonar este repositorio en el directorio raíz del proyecto:
+
+    submódulo git add https://github.com/alejandrososa/dockbox.git
+
+<blockquote>Si no está utilizando Git para su proyecto PHP, se puede utilizar git clone en lugar de git submodule.</blockquote>
+Nota: En este caso la estructura de carpetas será así:
+
+    - /var/www/html/aplicacion1
+        - dockbox
+        
+    - /var/www/html/aplicacion2
+        - dockbox
+        
+A.2) entorno de configuración primero y luego crear el proyecto:
+
+(En caso de que no tenga un proyecto y desea crear su proyecto dentro del entorno docker)
+
+1 - clonar este repositorio en cualquier lado de tu máquina:
+
+    git clone https://github.com/alejandrososa/dockbox.git
+    
+Nota: En este caso la estructura de carpetas será así:
+
+    - /var/www/html/
+        - dockbox
+        - aplicacion1
+        - aplicacion2
+    
+2 - Editar el `docker-compose.yml` para asignar el directorio del proyecto una vez que lo tenga (ejemplo: `- ../aplicacion1:/var/www`).
+
+3 - Detener y volver a ejecutar el comando `docker-compose para que los cambios tengan efecto.
+
+    docker-compose stop && docker-compose up -d XXXX YYYY ZZZZ ....
+
+**B) Configuración de Proyectos Múltiples:**
+
+1 - clonar este repositorio en cualquier lado de tu máquina:
+
+    git clone https://github.com/alejandrososa/dockbox.git
+
+2 - editar el `docker-compose.yml` para asignar los directorios de proyectos:
+
+    aplicaciones:
+        image: tianon/true
+        volumes:
+            - ../aplicacion1/:/var/www/aplicacion1
+            - ../aplicacion2/:/var/www/aplicacion2
+            
+3 - Se puede acceder a todos los sitios por visitar http://localhost/aplicacion1/public y http://localhost/aplicacion2/public pero por supuesto que no es muy útil por lo que vamos a php configurar rápidamente.
+
+4 - Ir a php/sites y copiar ejemplo.conf a aplicacion1.conf continuación, aplicacion2.conf
+
+5 - Abrir el virtual host `aplicacion1.conf` y editar el `ServerName` y el `DocumentRoot` de la siguiente manera:
+
+    ServerName aplicacion1.dev
+    DocumentRoot /var/www/aplicacion1/public
+    
+Haga lo mismo para cada proyecto `aplicacion2.conf`, `aplicacion3.conf`, ...
+
+6 - Añadir los dominios a tu **hosts**.
+
+    127.0.0.1  aplicacion1.dev
+    
+7 - Crear las bases de datos del proyecto. En este momento hay que hacerlo de forma manual mediante la introducción de su contenedor DB.
+
 ## Levantar nuestro entorno
 
 Ir al raíz de nuestro dockbox una vex descargado y ejecutar
 
-    $ docker-compose up
+    $ docker-compose up -d mysql php servidor
+    
+Puedes combinar según tu necesidad los siguientes contenedores: `servidor`, `mysql`, `php`, `postgres`, `postgres-postgis`, `mariadb`, `mongo`, `phpmyadmin`, `pgadmin`, `redis`, `elasticsearch`
+    
+    $ docker-compose up -d php servidor postgres redis elasticsearch
     
 ## Configuración con PHPStorm
 
@@ -70,6 +151,7 @@ Ver la documentación e imagenes en el directorio docs
 * [SSH](docs/SSH.md)
 * [XDebug](docs/XDebug.md)
 * [Host](docs/HostMachine.md)
+* [MySql](docs/MySql.md)
 
 ## Licencia
 
