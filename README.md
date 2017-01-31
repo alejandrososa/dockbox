@@ -155,4 +155,4 @@ Ver la documentación e imagenes en el directorio docs
 
 ## Licencia
 
-Copyright &copy; 2017 [Alejandro Sosa](http://github.com/alejandrososa). Licensed under the terms of the [MIT license](LICENSE.md).
+Copyright &copy; 2017 [Alejandro Sosa](http://github.com/alejandrososa). Licencia bajo los terminos [MIT license](LICENSE.md).
