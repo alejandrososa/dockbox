@@ -196,7 +196,7 @@ RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
         && rm -f /tmp/id_rsa* \
         && chmod 644 /home/desarrollador/.ssh/authorized_keys /home/desarrollador/.ssh/id_rsa.pub \
     && chmod 400 /home/desarrollador/.ssh/id_rsa \
-    && service ssh restart
+    && service ssh restart \
 ;fi
 
 
