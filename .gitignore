@@ -4,6 +4,6 @@
 /log/*
 /server/ssh/ssh-key
 /web/
-/php/sites/*
+/php/sites/
 !/php/sites/000-docker.conf
 !/php/sites/ejemplo.conf

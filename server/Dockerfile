@@ -187,20 +187,17 @@ RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
 
 USER desarrollador
 
-#RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
-
-#    ssh-keygen -b 2048 -t rsa -f /home/desarrollador/.ssh/id_rsa -q -N "" && \
-#
-#    rm -f /etc/service/sshd/down && \
-#    cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys \
-#        && cat /tmp/id_rsa.pub >> /home/desarrollador/.ssh/id_rsa.pub \
-#        && cat /tmp/id_rsa >> /home/desarrollador/.ssh/id_rsa \
-#        && cat /tmp/ssh-key >> /home/desarrollador/.ssh/authorized_keys \
-#        && rm -f /tmp/id_rsa* \
-#        && chmod 644 /root/.ssh/authorized_keys /root/.ssh/id_rsa.pub \
-#    && chmod 400 /root/.ssh/id_rsa \
-#    && service ssh restart
-#;fi
+RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
+    rm -f /etc/service/sshd/down && \
+    cat /tmp/id_rsa.pub >> /home/desarrollador/.ssh/authorized_keys \
+        && cat /tmp/id_rsa.pub >> /home/desarrollador/.ssh/id_rsa.pub \
+        && cat /tmp/id_rsa >> /home/desarrollador/.ssh/id_rsa \
+        && cat /tmp/ssh-key >> /home/desarrollador/.ssh/authorized_keys \
+        && rm -f /tmp/id_rsa* \
+        && chmod 644 /home/desarrollador/.ssh/authorized_keys /home/desarrollador/.ssh/id_rsa.pub \
+    && chmod 400 /home/desarrollador/.ssh/id_rsa \
+    && service ssh restart
+;fi
 
 
 
@@ -249,7 +246,9 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
         nvm install ${NODE_VERSION} && \
         nvm use ${NODE_VERSION} && \
         nvm alias ${NODE_VERSION} && \
-        npm install -g gulp bower vue-cli \
+        npm install -g less &&\
+        npm install -g webpack &&\
+        npm install -g gulp bower vue-cli gulp-cli \
 ;fi
 
 # Wouldn't execute when added to the RUN statement in the above block
@@ -278,7 +277,17 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
 USER desarrollador
 
 RUN echo "" >> ~/.bashrc && \
-    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
+    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc &&\
+    echo 'alias art="php artisan"' >> ~/.bashrc && \
+    echo 'alias sy="php bin/console"' >> ~/.bashrc
+
+USER root
+
+RUN echo "" >> ~/.bashrc && \
+    echo 'alias art="php artisan"' >> ~/.bashrc && \
+    echo 'alias sy="php bin/console"' >> ~/.bashrc
+
+
 #RUN source ~/.bashrc
 
 #
