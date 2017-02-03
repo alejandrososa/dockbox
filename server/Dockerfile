@@ -187,13 +187,18 @@ RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
 
 USER desarrollador
 
+ADD ssh/insecure_id_rsa /tmp/id_rsa
+ADD ssh/insecure_id_rsa.pub /tmp/id_rsa.pub
+ADD ssh/ssh-key /tmp/ssh-key
+ADD ssh/sshd_config /etc/ssh/sshd_config
+
 RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
     rm -f /etc/service/sshd/down && \
+    mkdir -p /home/desarrollador/.ssh && \
     cat /tmp/id_rsa.pub >> /home/desarrollador/.ssh/authorized_keys \
         && cat /tmp/id_rsa.pub >> /home/desarrollador/.ssh/id_rsa.pub \
         && cat /tmp/id_rsa >> /home/desarrollador/.ssh/id_rsa \
         && cat /tmp/ssh-key >> /home/desarrollador/.ssh/authorized_keys \
-        && rm -f /tmp/id_rsa* \
         && chmod 644 /home/desarrollador/.ssh/authorized_keys /home/desarrollador/.ssh/id_rsa.pub \
     && chmod 400 /home/desarrollador/.ssh/id_rsa \
     && service ssh restart \
