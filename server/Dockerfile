@@ -29,6 +29,7 @@ RUN apt-get install -y software-properties-common && \
 # Install "PHP Extentions", "libraries", "Software's"
 RUN apt-get update && \
     apt-get install -y --force-yes \
+        sudo \
         php7.0-cli \
         php7.0-common \
         php7.0-curl \
@@ -67,6 +68,7 @@ RUN apt-get update && \
         python-software-properties \
         libffi-dev \
         nodejs \
+        ruby-full \
     && apt-get clean
 
 
@@ -76,7 +78,6 @@ RUN apt-get update && \
 
 # Install composer and add its bin to the PATH.
 RUN curl -s http://getcomposer.org/installer | php && \
-    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
     mv composer.phar /usr/local/bin/composer
 
 # Source the bash
@@ -119,7 +120,7 @@ ARG COMPOSER_GLOBAL_INSTALL=false
 ENV COMPOSER_GLOBAL_INSTALL ${COMPOSER_GLOBAL_INSTALL}
 RUN if [ ${COMPOSER_GLOBAL_INSTALL} = true ]; then \
     # run the install
-    composer global install \
+    composer global install && composer global update \
 ;fi
 
 #####################################
@@ -136,13 +137,23 @@ RUN chmod -R 644 /etc/cron.d
 #####################################
 # User Aliases
 #####################################
-USER root
+USER desarrollador
 
 COPY ./aliases.sh /home/desarrollador/aliases.sh
+COPY ./aliases.sh /home/desarrollador/.aliases
 RUN echo "" >> ~/.bashrc
 RUN echo "# Load Custom Aliases" >> ~/.bashrc
-RUN echo "source /home/desarrollador/aliases.sh" >> ~/.bashrc
-RUN echo "" >> ~/.bashrc
+RUN echo "source /home/desarrollador/aliases.sh" >> ~/.bashrc && \
+    echo "#Composer Tools" >> ~/.bashrc && \
+    echo "export PATH=/home/desarrollador/.composer/vendor/bin:$PATH" >> ~/.bashrc
+
+USER root
+RUN echo "" >> ~/.bashrc && \
+    echo "# Load Custom Aliases" >> ~/.bashrc && \
+    echo "source /home/desarrollador/aliases.sh" >> ~/.bashrc && \
+    echo "" >> ~/.bashrc && \
+    echo "#Composer Tools" >> ~/.bashrc && \
+    echo "export PATH=/home/desarrollador/.composer/vendor/bin:$PATH" >> ~/.bashrc
 
 #####################################
 # xDebug:
@@ -153,8 +164,9 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
     # Load the xdebug extension only with phpunit commands
     apt-get update && \
     apt-get install -y --force-yes php7.0-xdebug && \
-    sed -i 's/^/;/g' /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
-    echo "alias phpunit='php -dzend_extension=xdebug.so /var/www/vendor/bin/phpunit'" >> ~/.bashrc \
+    sed -i 's/^/;/g' /etc/php/7.0/cli/conf.d/20-xdebug.ini \
+#    sed -i 's/^/;/g' /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
+#    echo "alias phpunit='php -dzend_extension=xdebug.so /var/www/vendor/bin/phpunit'" >> ~/.bashrc \
 ;fi
 # ADD for REMOTE debugging
 COPY ./xdebug.ini /etc/php/7.0/cli/conf.d/xdebug.ini
@@ -171,6 +183,7 @@ ADD ssh/insecure_id_rsa /tmp/id_rsa
 ADD ssh/insecure_id_rsa.pub /tmp/id_rsa.pub
 ADD ssh/ssh-key /tmp/ssh-key
 ADD ssh/sshd_config /etc/ssh/sshd_config
+RUN ssh-keygen -A
 
 RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
     rm -f /etc/service/sshd/down && \
@@ -191,6 +204,7 @@ ADD ssh/insecure_id_rsa /tmp/id_rsa
 ADD ssh/insecure_id_rsa.pub /tmp/id_rsa.pub
 ADD ssh/ssh-key /tmp/ssh-key
 ADD ssh/sshd_config /etc/ssh/sshd_config
+RUN ssh-keygen -A
 
 RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
     rm -f /etc/service/sshd/down && \
@@ -252,7 +266,11 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
         nvm use ${NODE_VERSION} && \
         nvm alias ${NODE_VERSION} && \
         npm install -g less &&\
+        npm install -g sass &&\
         npm install -g webpack &&\
+        npm install -g typescript &&\
+        npm install -g vue &&\
+        npm install -g react react-dom &&\
         npm install -g gulp bower vue-cli gulp-cli \
 ;fi
 
@@ -275,22 +293,15 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
 
 
 #####################################
-# Non-root user : PHPUnit path
+# Non-root user : FRAMEWORKS
 #####################################
 
 # add ./vendor/bin to non-root user's bashrc (needed for phpunit)
-USER desarrollador
-
-RUN echo "" >> ~/.bashrc && \
-    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc &&\
-    echo 'alias art="php artisan"' >> ~/.bashrc && \
-    echo 'alias sy="php bin/console"' >> ~/.bashrc
-
 USER root
 
-RUN echo "" >> ~/.bashrc && \
-    echo 'alias art="php artisan"' >> ~/.bashrc && \
-    echo 'alias sy="php bin/console"' >> ~/.bashrc
+RUN mkdir -p /usr/local/bin && \
+    curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony  && \
+    chmod a+x /usr/local/bin/symfony
 
 
 #RUN source ~/.bashrc
@@ -303,6 +314,11 @@ RUN echo "" >> ~/.bashrc && \
 
 # Clean up
 USER root
+RUN echo "" >> /etc/sudoers  && \
+    echo "# User privilege specification" >> /etc/sudoers  && \
+    echo "desarrollador   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers  && \
+    echo "" >> /etc/sudoers
+
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

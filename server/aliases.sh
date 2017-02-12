@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # Colors used for status updates
 ESC_SEQ="\x1b["
@@ -12,6 +12,8 @@ COL_CYAN=$ESC_SEQ"36;01m"
 
 # Commonly Used Aliases
 alias ..="cd .."
+alias dev="su desarrollador"
+alias admin="su -"
 alias c="clear"
 alias cla="clear && ls -l"
 alias cll="clear && ls -la"
@@ -22,7 +24,7 @@ alias g="gulp"
 alias home="cd ~"
 alias npm-global="npm list -g --depth 0"
 alias ra="reload"
-alias reload="source ~/.aliases && echo \"$COL_GREEN ==> Aliases Reloaded... $COL_RESET \n \""
+alias reload="source ~/.aliases && source ~/.bash_aliases && echo \"$COL_GREEN ==> Aliases Reloaded... $COL_RESET \n \""
 alias run="npm run"
 alias tree="xtree"
 
@@ -34,7 +36,14 @@ alias composer:dump="composer dump-autoload -o"
 alias db:reset="php artisan migrate:reset && php artisan migrate --seed"
 alias migrate="php artisan migrate"
 alias seed="php artisan:seed"
-alias phpunit="./vendor/bin/phpunit"
+alias tunit="./vendor/bin/phpunit"
+alias tdd="./vendor/bin/codecept"
+
+# Yii 2
+alias yii="php yii"
+
+# Symfony 3
+alias sy="php bin/console"
 
 
 # requires installation of 'https://www.npmjs.com/package/npms-cli'

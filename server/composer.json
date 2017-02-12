@@ -1,5 +1,19 @@
 {
+    "authors": [
+        {
+            "name": "Alejandro Sosa",
+            "email": "alesjohnson@hotmail.com"
+        }
+    ],
     "require": {
-
+        "laravel/installer": "*",
+        "fxp/composer-asset-plugin": "^1.2.2",
+        "deployer/deployer": "*",
+        "phpunit/php-invoker": "*",
+        "phpunit/dbunit": "*",
+        "codeception/codeception": "2.2.5",
+        "codeception/specify": "*",
+        "codeception/verify": "*",
+        "phpunit/phpunit": "*"
     }
-} 
+}
