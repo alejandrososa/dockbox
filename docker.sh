@@ -1,9 +1,4 @@
-alias sy='php bin/console'
 alias dc='docker-compose'
-
-alias phpStorm='sh /opt/phpstorm/bin/phpstorm.sh'
-alias serverPreAdgo='ssh -i ~/Documentos/ADGO/seguridad/id_rsa adgo@104.199.34.123'
-alias serverToolsAdgo='ssh -i ~/Documentos/ADGO/seguridad/id_rsa adgo@104.199.50.148'
 
 dockerUp(){
 	#connfiguración
