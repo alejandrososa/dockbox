@@ -95,7 +95,7 @@ services:
                 - MYSQL_ROOT_PASSWORD=root
         volumes:
             - mysql:/var/lib/mysql
-            - ./log/mysql:/var/lib/mysql
+            - ./data/mysql:/var/lib/mysql
         ports:
             - "3306:3306"
         extra_hosts:
@@ -109,7 +109,8 @@ services:
     postgres:
         build: ./postgres
         volumes:
-            - postgres:/var/lib/postgresql/data
+            - ./data/postgres:/var/lib/postgresql/data
+            - ./log/postgres:/var/log/postgresql
         ports:
             - "5432:5432"
         environment:
@@ -124,7 +125,7 @@ services:
     postgres-postgis:
         build: ./postgres-postgis
         volumes:
-            - postgres:/var/lib/postgresql/data
+            - ./data/postgres:/var/lib/postgresql/data
         ports:
             - "5433:5432"
         environment:
@@ -139,7 +140,7 @@ services:
     mariadb:
         build: ./mariadb
         volumes:
-            - mariadb:/var/lib/mysql
+            - ./data/mariadb:/var/lib/mysql
         ports:
             - "3307:3306"
         environment:
@@ -157,7 +158,8 @@ services:
         ports:
             - "27017:27017"
         volumes:
-            - mongo:/data/db
+            - ./data/mongo/db:/data/db
+            - ./data/mongo/configdb:/data/configdb
 
 
 ###
@@ -196,7 +198,7 @@ services:
     redis:
         build: ./redis
         volumes:
-            - redis:/data
+            - ./data/redis:/data
         ports:
             - "6379:6379"
 
@@ -207,8 +209,8 @@ services:
     elasticsearch:
         build: ./elasticsearch
         volumes:
-            - elasticsearch-data:/usr/share/elasticsearch/data
-            - elasticsearch-plugins:/usr/share/elasticsearch/data
+            - ./data/elasticsearch/data:/usr/share/elasticsearch/data
+            - ./data/elasticsearch/plugins:/usr/share/elasticsearch/data
         ports:
             - "9200:9200"
             - "9300:9300"
