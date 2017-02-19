@@ -11,7 +11,7 @@ Contiene las herramientas basicas para que hagas de tus desarrollos lo más como
 
 * [Ubuntu 16.04](https://www.ubuntu.com/)
 * [PHP 7.0](http://php.net/manual/es/migration70.new-features.php)
-* [MySql 5.7](http://www.mysql.com/)
+* [MySql 8.0](http://www.mysql.com/)
 * [MongoDB 3.4](http://www.mongodb.org/)
 * [MariaDb 10.0](https://mariadb.org/)
 * [Postgres 9.6.1](https://www.postgresql.org/)
@@ -28,6 +28,8 @@ Contiene las herramientas basicas para que hagas de tus desarrollos lo más como
 * [Docker Machine](https://docs.docker.com/machine/) (Mac and Windows only)
 
 ## Instalar Docker en Ubuntu
+
+Ver documentación oficial [Docker](https://docs.docker.com/engine/installation/)
 
 Agregar el deb de docker a nuestro listado de software
 
@@ -136,6 +138,9 @@ Haga lo mismo para cada proyecto `aplicacion2.conf`, `aplicacion3.conf`, ...
 
 ## Levantar nuestro entorno
 
+El primer paso antes de levantar nuestro entorno es crear una key de seguridad con ssh-keygen, no te preocupes, lo explico todo en [SSH](docs/SSH.md).
+Ahora que ya tienes tu key-ssh, continúa las indicaciones.
+
 Ir al raíz de nuestro dockbox una vex descargado y ejecutar
 
     $ docker-compose up -d mysql php servidor
@@ -148,10 +153,18 @@ Puedes combinar según tu necesidad los siguientes contenedores: `servidor`, `my
 
 Ver la documentación e imagenes en el directorio docs
 
+* [Comandos Alias](docs/ComandosAlias.md)
 * [SSH](docs/SSH.md)
 * [XDebug](docs/XDebug.md)
 * [Host](docs/HostMachine.md)
+* [JavaScript](docs/JavaScript.md)
 * [MySql](docs/MySql.md)
+* [PostgresSql](docs/PostgresSql.md)
+
+## Log de cambios
+- 19/02/2017 - Corrección de persistencia de datos en postgres.
+- 11/02/2017 - Corrección de permisos de usuario desarrollador en el contenedor servidor.
+- 05/02/2017 - Instalación de librerías Js al contenedor servidor.
 
 ## Licencia
 

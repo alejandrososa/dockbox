@@ -1,11 +1,35 @@
-## Consola
+# PostgresSql
 
-Conectarse a mysql desde consola con tu Ip
+Hay varias maneras de acceder a postgres y te lo explico en las siguientes lineas...
+
+## A través del contenedor
+
+Una vez que ya has inicializado el contenedor de `postgres` puedes acceder al contenedor con el siguiente comando
+
+    docker-compose exec postgres bash
+
+Dentro del contenedor debes cambiar al usuario `postgres` y luego ejecutar el psql
+    
+    root@26db16090640:/# su postgres
+    $ psql
+    
+    psql (9.6.2)
+    Type "help" for help.
+    
+    postgres=# 
+
+## Por medio de la consola
+
+Conectarse a postgres desde consola con tu Ip
 
     psql -h 127.0.0.1 -U dev -W demo
     psql -h 192.168.1.52 -U dev -W demo
+    
+    
+**Nota:** para crear nuevas bases de datos te recomiendo entrar a traves del contenedor...
 
-Confiración con frameworks
+
+Configuración con frameworks
 ====
 ## Symfony 3
 

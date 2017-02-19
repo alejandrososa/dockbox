@@ -30,6 +30,7 @@ RUN apt-get install -y software-properties-common && \
 RUN apt-get update && \
     apt-get install -y --force-yes \
         sudo \
+        php-pear \
         php7.0-cli \
         php7.0-common \
         php7.0-curl \

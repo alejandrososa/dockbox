@@ -25,7 +25,8 @@ RUN apt-get install -y libpq-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
-RUN apt-get install nano
+RUN apt-get update
+RUN apt-get install -y --force-yes php-pear nano
 
 
 #####################################
@@ -36,6 +37,9 @@ ENV TERM xterm
 ADD ./sites/*.conf /etc/apache2/sites-available/
 RUN a2dissite 000-default
 RUN a2ensite 000-docker
+RUN a2ensite ofertaskilaravel
+RUN a2ensite app-ofertaski
+RUN a2ensite iltuoprestito
 RUN a2enmod rewrite
 RUN apache2ctl restart
 

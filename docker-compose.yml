@@ -109,7 +109,7 @@ services:
     postgres:
         build: ./postgres
         volumes:
-            - ./data/postgres:/var/lib/postgresql/data
+            - ./data/postgres/data:/var/lib/postgresql/data
             - ./log/postgres:/var/log/postgresql
         ports:
             - "5432:5432"
@@ -125,7 +125,7 @@ services:
     postgres-postgis:
         build: ./postgres-postgis
         volumes:
-            - ./data/postgres:/var/lib/postgresql/data
+            - ./data/postgis/data:/var/lib/postgresql/data
         ports:
             - "5433:5432"
         environment:
