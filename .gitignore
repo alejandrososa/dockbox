@@ -3,8 +3,7 @@
 /.idea/
 /log/*
 /server/ssh/ssh-key
-/web/
-/php/sites/
+/php/sites/*
 !/php/sites/000-docker.conf
 !/php/sites/ejemplo.conf
 /data/elasticsearch/*
@@ -22,5 +21,6 @@
 /mysql/sql/*
 !/mysql/sql/.gitkeep
 !/mysql/sql/init-demo-db.sh
+/postgres/sql/*
 !/postgres/sql/.gitkeep
 !/postgres/sql/init-demo-db.sh

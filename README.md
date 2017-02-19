@@ -7,7 +7,7 @@ DockBox es un entorno de desarrollo PHP con Docker. El objetivo es facilitar el 
 Contiene las herramientas basicas para que hagas de tus desarrollos lo más comodo sin la necesidad de instalarte software u otras tecnologías en tu maquina.
 </blockquote>
 
-## ¿Qué hay en el entorno ecológico de desarrollo?**
+## ¿Qué hay en el entorno ecológico de desarrollo?
 
 * [Ubuntu 16.04](https://www.ubuntu.com/)
 * [PHP 7.0](http://php.net/manual/es/migration70.new-features.php)
@@ -217,7 +217,29 @@ Ver la documentación e imagenes en el directorio docs
 * [Host](docs/HostMachine.md)
 * [JavaScript](docs/JavaScript.md)
 * [MySql](docs/MySql.md)
-* [PostgreSql](docs/PostgreSql.md)
+* [PostgresSql](docs/PostgreSql.md)
+
+## Comandos utiles de docker
+
+Listar contenedores levantados
+    
+    docker ps
+
+Listar contenedores inactivos
+
+    docker ps -a
+    
+Detener todos los contenedores activod
+
+    docker stop $(docker ps -q -a)
+
+Eliminar imagenes 
+
+    docker rmi -f $ (docker images -q)
+
+Eliminar contenedores
+
+    docker rm -f $ (docker ps -q -a)
 
 ## Log de cambios
 - 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.

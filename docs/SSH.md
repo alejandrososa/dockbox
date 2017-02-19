@@ -1,3 +1,4 @@
+# SSH
 ## Conexión vía ssh al contenedor servidor
 
 Generando una nueva key ssh para conectarse al contenedor llamado `servidor`
@@ -93,16 +94,18 @@ Si te apetece, puedes agregar tus propios alias modificando el fichero `server/a
     alias gs="git status"
     alias whoops="git reset --hard && git clean -df"
 
-
 **Directorios**
-    function mkd() {
-        mkdir -p "$@" && cd "$@"
-    }
-    
-    function md() {
-        mkdir -p "$@" && cd "$@"
-    }
-    
-    function xtree {
-        find ${1:-.} -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
-    }
+
+```
+function mkd() {
+    mkdir -p "$@" && cd "$@"
+}
+
+function md() {
+    mkdir -p "$@" && cd "$@"
+}
+
+function xtree {
+    find ${1:-.} -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+}
+```

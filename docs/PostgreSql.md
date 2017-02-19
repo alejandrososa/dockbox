@@ -111,7 +111,7 @@ Puedes administrar tus bases de datos con tu software preferido.
 Te recomiendo utilizar tu ipaddress como host.
 
 **PG Commander**<br>
-![Usuario dev](imagenes/PostgresSQL.png)
+![Usuario dev](imagenes/PostgreSQL.png)
 
 **PG Admin**<br>
 ![Usuario Root](imagenes/PGAdmin.png)

@@ -96,6 +96,11 @@ ARG PGID=1000
 RUN groupadd -g $PGID desarrolladores && \
     useradd -u $PUID -g desarrolladores -m desarrollador
 
+RUN echo "" >> /etc/sudoers  && \
+    echo "# User privilege specification" >> /etc/sudoers  && \
+    echo "desarrollador   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers  && \
+    echo "" >> /etc/sudoers
+
 #####################################
 # Set Timezone
 #####################################
@@ -177,9 +182,6 @@ COPY ./xdebug.ini /etc/php/7.0/cli/conf.d/xdebug.ini
 #####################################
 ARG INSTALL_WORKSPACE_SSH=false
 ENV INSTALL_WORKSPACE_SSH ${INSTALL_WORKSPACE_SSH}
-
-#ADD desarrollador_rsa /tmp/id_rsa
-#ADD desarrollador_rsa.pub /tmp/id_rsa.pub
 ADD ssh/insecure_id_rsa /tmp/id_rsa
 ADD ssh/insecure_id_rsa.pub /tmp/id_rsa.pub
 ADD ssh/ssh-key /tmp/ssh-key
@@ -261,18 +263,18 @@ ENV INSTALL_NODE ${INSTALL_NODE}
 ENV NVM_DIR /home/desarrollador/.nvm
 RUN if [ ${INSTALL_NODE} = true ]; then \
     # Install nvm (A Node Version Manager)
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.6/install.sh | bash && \
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash && \
         . $NVM_DIR/nvm.sh && \
         nvm install ${NODE_VERSION} && \
         nvm use ${NODE_VERSION} && \
         nvm alias ${NODE_VERSION} && \
-        npm install -g less &&\
-        npm install -g sass &&\
-        npm install -g webpack &&\
-        npm install -g typescript &&\
-        npm install -g vue &&\
-        npm install -g react react-dom &&\
-        npm install -g gulp bower vue-cli gulp-cli \
+        npm install -g less && \
+        npm install -g sass && \
+        npm install -g webpack && \
+        npm install -g typescript && \
+        npm install -g vue && \
+        npm install -g react react-dom && \
+        npm install -g gulp-cli gulp bower vue-cli \
 ;fi
 
 # Wouldn't execute when added to the RUN statement in the above block
@@ -315,11 +317,6 @@ RUN mkdir -p /usr/local/bin && \
 
 # Clean up
 USER root
-RUN echo "" >> /etc/sudoers  && \
-    echo "# User privilege specification" >> /etc/sudoers  && \
-    echo "desarrollador   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers  && \
-    echo "" >> /etc/sudoers
-
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

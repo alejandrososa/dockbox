@@ -37,9 +37,6 @@ ENV TERM xterm
 ADD ./sites/*.conf /etc/apache2/sites-available/
 RUN a2dissite 000-default
 RUN a2ensite 000-docker
-RUN a2ensite ofertaskilaravel
-RUN a2ensite app-ofertaski
-RUN a2ensite iltuoprestito
 RUN a2enmod rewrite
 RUN apache2ctl restart
 
