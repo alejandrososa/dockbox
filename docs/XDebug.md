@@ -3,16 +3,16 @@
 Esta configuración la puedes cambiar antes de hacer el docker-compose build en el archivo que se encuentra en en la carpeta php `php/xdbug.ini`  
 A continación te indico como configurar tu PhpStorm paso a paso, tener en cuenta cambiar tu ipaddres por la que muestro en las imagenes `10.254.254.254`
 
-**Paso 1**
+**Paso 1**<br>
 ![Paso 1](imagenes/1-XDebug-configuración.png)
 
-**Paso 2**
+**Paso 2**<br>
 ![Paso 2](imagenes/2-XDebug-DBGp.png)
 
-**Paso 3**
+**Paso 3**<br>
 ![Paso 3](imagenes/3-XDebug-WebApplication.png)
 
-**Paso 4**
+**Paso 4**<br>
 ![Paso 4](imagenes/4-XDebug-Server.png)
 
 **Paso 5 (Opcional)**<br>
@@ -23,7 +23,7 @@ Crear alias para el host remoto y localhost
 
 ![Paso 5](imagenes/5-XDebug-AliasRemoteHost.png)
 
-**Paso 6**
+**Paso 6**<br>
 ![Paso 6](imagenes/6-XDebug-Resultado.png)
 
     
