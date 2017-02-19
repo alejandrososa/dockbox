@@ -149,6 +149,64 @@ Puedes combinar según tu necesidad los siguientes contenedores: `servidor`, `my
     
     $ docker-compose up -d php servidor postgres redis elasticsearch
     
+## Contenedores
+    
+Ya tenemos nuestro entorno de desarrollo ya está creado y levantado, pero la pregunta es ¿de qué disponemos en los contenedores para desarrollar?.
+ 
+**Servidor**<br>
+A nivel global en el contenedor encontrarás:
+- Php 7.0
+- Composer
+- PhpUnit 5.7
+- Codecept
+- Deployer
+- Git
+- Symfony
+- Laravel
+- Yii 2 (debe instalar yiisoft con el token)
+- NodeJs
+- Less
+- Sass
+- Webpack
+- TypeScript
+- XDebug
+- Curl
+- Json
+- Mbstring
+- Sqlite3
+- Vim
+- Nano
+- Ruby
+- Pear
+
+**PHP**<br>
+- Php 7.0
+- Apache2
+- XDebug
+- OPCache
+- Soap
+- Redis
+- MongoDb
+- Zip
+- Bcmath
+- Mysqli
+- Tokenizer
+- GD
+- PDO 
+- PDO Mysql
+- PDO Postgres
+- Pgsql
+- Pear
+
+**Mysql**<br>
+- Mysql
+
+**Postgres**<br>
+- Postgresql
+
+
+    
+    
 ## Configuración con PHPStorm
 
 Ver la documentación e imagenes en el directorio docs
@@ -159,9 +217,10 @@ Ver la documentación e imagenes en el directorio docs
 * [Host](docs/HostMachine.md)
 * [JavaScript](docs/JavaScript.md)
 * [MySql](docs/MySql.md)
-* [PostgresSql](docs/PostgresSql.md)
+* [PostgreSql](docs/PostgreSql.md)
 
 ## Log de cambios
+- 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.
 - 19/02/2017 - Corrección de persistencia de datos en postgres.
 - 11/02/2017 - Corrección de permisos de usuario desarrollador en el contenedor servidor.
 - 05/02/2017 - Instalación de librerías Js al contenedor servidor.

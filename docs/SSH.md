@@ -1,4 +1,4 @@
-## Conexión vía ssh
+## Conexión vía ssh al contenedor servidor
 
 Generando una nueva key ssh para conectarse al contenedor llamado `servidor`
 
@@ -19,7 +19,90 @@ Ahora el ultimo paso es crear el fichero ssh-key con tu key ya generada ejecutan
 Listo, ya puedes conectarte al contenedor `servidor` con el usuario root, con estos pasos realizados no necesitarás la clave 
     
     ssh root@127.0.0.1 -p 2222
+   
+   
+### Usuarios
     
 Ya dentro del contenedor puedes cambiar a el usuario `desarrollador`
 
     su desarrollador
+    
+### Alias
+
+Los alias son una importante ayuda a la hora de ejecutar comandos, por eso he agregado a los usuarios `root` y `desarrollador` los siguientes alias.
+Si te apetece, puedes agregar tus propios alias modificando el fichero `server/aliases.sh`, estos cambios que hagas sólo tendrán efecto en el siguiente `docker-compose build` que realices.
+
+**Comandos de uso común**
+
+    alias ..="cd .."
+    alias dev="su desarrollador"
+    alias admin="su -"
+    alias c="clear"
+    alias cla="clear && ls -l"
+    alias cll="clear && ls -la"
+    alias cls="clear && ls"
+    alias code="cd /var/www"
+    alias ea="vi ~/aliases"
+    alias g="gulp"
+    alias home="cd ~"
+    alias npm-global="npm list -g --depth 0"
+    alias ra="reload"
+    alias reload="source ~/.aliases && source ~/.bash_aliases && echo \"$COL_GREEN ==> Aliases Reloaded... $COL_RESET \n \""
+    alias run="npm run"
+    alias tree="xtree"
+
+**Laravel / PHP Alisases**
+    
+    alias art="php artisan"
+    alias artisan="php artisan"
+    alias cdump="composer dump-autoload -o"
+    alias composer:dump="composer dump-autoload -o"
+    alias db:reset="php artisan migrate:reset && php artisan migrate --seed"
+    alias migrate="php artisan migrate"
+    alias seed="php artisan:seed"
+    alias tunit="./vendor/bin/phpunit"
+    alias tdd="./vendor/bin/codecept"
+
+**Yii 2**
+
+    alias yii="php yii"
+
+**Symfony 3**
+
+    alias sy="php bin/console"
+
+**NodeJs**
+    
+    # requires installation of 'https://www.npmjs.com/package/npms-cli'
+    alias npms="npms search"
+
+    # requires installation of 'https://www.npmjs.com/package/package-menu-cli'
+    alias pm="package-menu"
+
+    # requires installation of 'https://www.npmjs.com/package/pkg-version-cli'
+    alias pv="package-version"
+
+    # requires installation of 'https://github.com/sindresorhus/latest-version-cli'
+    alias lv="latest-version"
+
+**Git**
+    
+    alias gaa="git add ."
+    alias gd="git --no-pager diff"
+    alias git-revert="git reset --hard && git clean -df"
+    alias gs="git status"
+    alias whoops="git reset --hard && git clean -df"
+
+
+**Directorios**
+    function mkd() {
+        mkdir -p "$@" && cd "$@"
+    }
+    
+    function md() {
+        mkdir -p "$@" && cd "$@"
+    }
+    
+    function xtree {
+        find ${1:-.} -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+    }

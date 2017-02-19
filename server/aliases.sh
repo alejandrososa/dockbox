@@ -45,7 +45,6 @@ alias yii="php yii"
 # Symfony 3
 alias sy="php bin/console"
 
-
 # requires installation of 'https://www.npmjs.com/package/npms-cli'
 alias npms="npms search"
 

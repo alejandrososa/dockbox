@@ -110,6 +110,7 @@ services:
         build: ./postgres
         volumes:
             - ./data/postgres/data:/var/lib/postgresql/data
+            - ./data/postgres/backup:/var/lib/postgresql/backup
             - ./log/postgres:/var/log/postgresql
         ports:
             - "5432:5432"
