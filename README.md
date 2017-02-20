@@ -235,11 +235,11 @@ Detener todos los contenedores activod
 
 Eliminar imagenes 
 
-    docker rmi -f $ (docker images -q)
+    docker rmi -f $(docker images -q)
 
 Eliminar contenedores
 
-    docker rm -f $ (docker ps -q -a)
+    docker rm -f $(docker ps -q -a)
 
 ## Log de cambios
 - 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.
