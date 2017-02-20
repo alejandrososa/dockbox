@@ -25,7 +25,12 @@ Conectarse a postgres desde consola con tu Ip
     psql -h 127.0.0.1 -U dev -W demo
     psql -h 192.168.1.52 -U dev -W demo
     
-**Nota:** para crear nuevas bases de datos te recomiendo entrar a traves del contenedor...
+**Nota:** para crear nuevas bases de datos te recomiendo entrar a traves del contenedor.
+
+**Crear bases de datos**<br>
+Puedes crear una base de datos desde consola sin entrar al contenedor
+
+    docker exec dockbox_postgres_1 sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" exec createdb NOMBRE_BASE_DE_DATOS -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
 
 ## Bases de datos inicializadas
 
