@@ -219,6 +219,23 @@ services:
             - php
 
 
+###
+### JENKINS
+###
+    jenkins:
+        build: ./jenkins
+        restart: always
+#        environment:
+#            JAVA_OPTS: "-Djava.util.logging.config.file=/var/jenkins_home/log.properties"
+        ports:
+          - '8082:8080'
+          - '444:8443'
+          - '50000:50000'
+        volumes:
+          - ./data/jenkins/jenkins_home:/var/jenkins_home
+          - ./data/jenkins/docker.sock:/var/run/docker.sock
+          - ./data/jenkins/docker:/usr/bin/docker
+
 volumes:
     mysql:
         driver: "local"
@@ -239,4 +256,6 @@ volumes:
     elasticsearch-plugins:
         driver: "local"
     sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
+        driver: "local"
+    jenkins_data:
         driver: "local"
