@@ -20,6 +20,7 @@ Contiene las herramientas basicas para que hagas de tus desarrollos lo más como
 * [Redis 3.2](http://redis.io/)
 * [PHPMyAdmin 4.6.6](https://www.phpmyadmin.net/)
 * [PGAdmin 4 v1.1](https://www.pgadmin.org/)
+* [Jenkins 2.32](https://jenkins.io)
 
 ## Requerimientos
 
@@ -204,6 +205,9 @@ A nivel global en el contenedor encontrarás:
 **Postgres**<br>
 - Postgresql
 
+**Jenkins**<br>
+- Jenkins 2.32.3
+
 
     
     
@@ -213,11 +217,13 @@ Ver la documentación e imagenes en el directorio docs
 
 * [Comandos Alias](docs/ComandosAlias.md)
 * [SSH](docs/SSH.md)
+* [PHP](docs/PHP.md)
 * [XDebug](docs/XDebug.md)
 * [Host](docs/HostMachine.md)
 * [JavaScript](docs/JavaScript.md)
 * [MySql](docs/MySql.md)
 * [PostgresSql](docs/PostgreSql.md)
+* [Jenkins](docs/Jenkins.md)
 
 ## Alias para ejecutar dockbox
 
@@ -259,6 +265,7 @@ Eliminar contenedores
     docker rm -f $(docker ps -q -a)
 
 ## Log de cambios
+- 13/03/2017 - Se añade el contenedor Jenkins y documentación
 - 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.
 - 19/02/2017 - Corrección de persistencia de datos en postgres.
 - 11/02/2017 - Corrección de permisos de usuario desarrollador en el contenedor servidor.

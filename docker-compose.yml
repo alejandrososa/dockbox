@@ -224,11 +224,8 @@ services:
 ###
     jenkins:
         build: ./jenkins
-#        restart: always
-#        environment:
-#            JAVA_OPTS: "-Djava.util.logging.config.file=/var/jenkins_home/log.properties"
         ports:
-          - '8082:80'
+          - '49001:8080'
           - '444:8443'
           - '50000:50000'
         volumes:
@@ -257,5 +254,5 @@ volumes:
         driver: "local"
     sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
         driver: "local"
-#    jenkins_data:
-#        driver: "local"
+    jenkins:
+        driver: "local"
