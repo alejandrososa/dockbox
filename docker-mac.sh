@@ -8,40 +8,6 @@ dockerup(){
 	#eliminar know host
 	#ssh-keygen -f "~/.ssh/known_hosts" -R [127.0.0.1]:2222
 
-	#parar servicios
-	echo "Revisión de servicios locales"
-
-	MySQL=$(checkServiceIsRunning mysql);
-	Apache=$(checkServiceIsRunning apache2);
-	Postgres=$(checkServiceIsRunning postgres);
-
-	if [ "$MySQL" -ne "1" ];
-	then
-		echo "   -MySQL esta encendido. Apagado!!!";
-		sudo service mysql stop
-	else
-		echo "   -MySql apagado.";
-	fi
-
-	#-----------------------
-	if [ "$Apache" -ne 1 ];
-	then
-		echo "   -Apache2 esta encendido. Apagado!!!";
-		sudo service apache2 stop
-	else
-		echo "   -Apache2 apagado.";
-	fi;
-
-	#-----------------------
-	if [ "$Postgres" -ne 1 ];
-	then
-		echo "   -Postgres esta encendido. Apagado!!!";
-		sudo service postgresql stop
-	else
-		echo "   -Postgres apagado.";
-	fi;
-
-
 	#ir a dockbox
 	cd $dockerPath
 
