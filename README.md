@@ -219,6 +219,23 @@ Ver la documentación e imagenes en el directorio docs
 * [MySql](docs/MySql.md)
 * [PostgresSql](docs/PostgreSql.md)
 
+## Alias para ejecutar dockbox
+
+Para hacer la vida más sencilla y no tener que entrar al directorio `/var/www/html/dockbox` cada vez que necesites usar los contenedores, he preparado unos alias con los siguientes comandos:
+
+- **dockerup** = levanta el dockbox con los contenedores `mysql php postgres servidor` por defecto.  
+Puedes especificar los contenedores ejecutando `dockerup mysql redis php servidor`
+- **dockerdown** = detiene el dockbox y apaga los contenedores.
+- **dockerrebuild** = actualiza el dockbox con la ultima versíon. Elimina contenedores, bases de datos y configuración de proyectos.
+Se recomienda hacer una copia de `php\Dockerfile`, solo las lineas `a2ensite MI_DOMINIO` para volver a añadir los sites que hemos ido configurando y también `docker-compose.yml`, sólo las lineas donde hemos ido agregando las rutas de los proyectos.
+
+Para agregarlos a tus alias ejecuta los siguientes comandos:
+
+    cd /var/www/html/dockbox
+    cat docker.sh >> ~/.bash_aliases  && source ~/.bash_aliases         Linux
+    cat docker-mac.sh >> ~/.bash_profile && source ~/.bash_profile      Mac
+    
+
 ## Comandos utiles de docker
 
 Listar contenedores levantados
@@ -235,11 +252,11 @@ Detener todos los contenedores activod
 
 Eliminar imagenes 
 
-    docker rmi -f $ (docker images -q)
+    docker rmi -f $(docker images -q)
 
 Eliminar contenedores
 
-    docker rm -f $ (docker ps -q -a)
+    docker rm -f $(docker ps -q -a)
 
 ## Log de cambios
 - 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.
