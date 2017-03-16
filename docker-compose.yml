@@ -27,11 +27,13 @@ services:
             context: ./server
             args:
                 - INSTALL_XDEBUG=true
+                - INSTALL_MONGO=true
                 - INSTALL_NODE=true
                 - COMPOSER_GLOBAL_INSTALL=true
                 - INSTALL_WORKSPACE_SSH=true
                 - PUID=1000
                 - PGID=1000
+                - INSTALL_DEPLOYER=false
                 - NODE_VERSION=stable
                 - TZ=UTC
                 #- API_TOKEN_COMPOSER=
@@ -57,10 +59,10 @@ services:
             args:
                 - INSTALL_XDEBUG=true
                 - INSTALL_SOAP=true
-                - INSTALL_MONGO=TRUE
+                - INSTALL_MONGO=true
                 - INSTALL_ZIP_ARCHIVE=true
                 - INSTALL_BCMATH=false
-                - INSTALL_PHPREDIS=fTRUE
+                - INSTALL_PHPREDIS=true
                 - INSTALL_MEMCACHED=false
                 - INSTALL_OPCACHE=true
                 - INSTALL_AEROSPIKE_EXTENSION=false
@@ -232,6 +234,24 @@ services:
           - ./data/jenkins/jenkins_home:/var/jenkins_home
           - ./data/jenkins/docker.sock:/var/run/docker.sock
           - ./data/jenkins/docker:/usr/bin/docker
+
+
+
+###
+### RABBITMQ
+###
+    rabbitmq:
+        build: ./rabbitmq
+        ports:
+            - "5672:5672"
+            - "15671:15671"
+            - "8082:15672"
+        privileged: true
+        environment:
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+        links:
+            - php
 
 volumes:
     mysql:
