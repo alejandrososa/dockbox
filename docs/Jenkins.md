@@ -21,6 +21,14 @@ Debes tener en cuenta que si eliminas este directorio, se perderá tu configurac
 
 Puedes configurar a tu manera el contenedor de jenkins, aquí te dejo un buen enlace [Tutorial Jenkins](https://engineering.riotgames.com/news/jenkins-ephemeral-docker-tutorial)
 
+## No se levanta el contendor?
+
+Si te ocurre que no se levanta el contenedor de jenkins, manten la calma y ejecuta los siguientes comandos:
+
+    cd /var/www/html/dockbox
+    sudo chown $(whoami) -R data/jenkins
+    sudo chmod 777 -R data/jenkins/
+
 ## Plugins
 
 Plugins disponible para instalar:
