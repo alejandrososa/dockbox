@@ -265,6 +265,7 @@ Eliminar contenedores
     docker rm -f $(docker ps -q -a)
 
 ## Log de cambios
+- 15/03/2017 - Se añade el contenedor Rabbitmq
 - 13/03/2017 - Se añade el contenedor Jenkins y documentación
 - 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.
 - 19/02/2017 - Corrección de persistencia de datos en postgres.
