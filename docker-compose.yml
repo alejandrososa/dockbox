@@ -73,25 +73,16 @@ services:
             - ./log/apache2:/var/log/apache2
         expose:
             - "9000"
-        depends_on:
+        links:
             - servidor
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.18.0.7"
-            - "affiliate.adgo-tech.dev:172.21.0.6"
-            - "template.adgo-tech.dev:172.21.0.6"
+            - "dockerhost:172.19.0.4"
         ports:
           - "80:80"
           - "443:443"
         links:
           - mysql
-        networks:
-            apache:
-                ipv4_address: 172.21.0.6
-                ipv6_address: fe80::42:acff:fe15:6
-#                0:0:0:0:0:ffff:ac15:6
-
-
 
 ###
 ### MYSQL
@@ -262,31 +253,6 @@ services:
         links:
             - php
 
-
-networks:
-    apache:
-        # use the bridge driver, but enable IPv6
-        driver: bridge
-        driver_opts:
-            com.docker.network.enable_ipv6: "true"
-            com.docker.network.bridge.enable_ip_masquerade: "false"
-        ipam:
-            driver: default
-            config:
-                - subnet: 172.21.0.0/24
-                  gateway: 172.21.0.1
-                - subnet: "fe80::42:acff:fe15:6/64"
-                  gateway: "fe80::42:acff:fe15:1"
-##        driver: default
-##        driver: bridge
-#        driver_opts:
-#            com.docker.network.enable_ipv6: "true"
-##            com.docker.network.bridge.enable_ip_masquerade: "true"
-#        ipam:
-#            driver: default
-#            config:
-#            - subnet: 172.21.0.0/16
-#              gateway: 172.21.0.1
 
 
 volumes:
