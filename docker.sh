@@ -1,4 +1,6 @@
 alias dc='docker-compose'
+alias serverdocker='ssh root@127.0.0.1 -p 2222'
+alias mysqldocker='mysql -h IP_ADDRESS -u root -proot'
 
 dockerup(){
 	#connfiguración
