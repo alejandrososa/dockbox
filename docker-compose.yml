@@ -77,9 +77,7 @@ services:
             - servidor
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.18.0.7"
-            - "affiliate.adgo-tech.dev:172.21.0.6"
-            - "template.adgo-tech.dev:172.21.0.6"
+            - "dockerhost:172.19.0.4"
         ports:
           - "80:80"
           - "443:443"
