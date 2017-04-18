@@ -1,62 +1,40 @@
-FROM php:7.0-apache
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libmcrypt-dev \
-        libpng12-dev \
-        curl \
-        libmemcached-dev \
-        libz-dev \
-        libpq-dev \
-        libjpeg-dev \
-        libssl-dev \
-    && docker-php-ext-install -j$(nproc) iconv mcrypt \
-    && docker-php-ext-configure gd \
-    --with-freetype-dir=/usr/include/ \
-    --with-jpeg-dir=/usr/include/ \
-    --enable-gd-native-ttf \
-    && docker-php-ext-install -j$(nproc) gd
+#
+#--------------------------------------------------------------------------
+# Image Setup
+#--------------------------------------------------------------------------
+#
+# To edit the 'php-fpm' base Image, visit its repository on Github
+#    https://github.com/LaraDock/php-fpm
+#
+# To change its version, see the available Tags on the Docker Hub:
+#    https://hub.docker.com/r/laradock/php-fpm/tags/
+#
 
-#drivers
-RUN docker-php-ext-install pdo pdo_mysql bcmath
+FROM laradock/php-fpm:7.0--1.4
 
-# Install Postgre PDO
-RUN apt-get install -y libpq-dev \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
-    && docker-php-ext-install pdo pdo_pgsql pgsql
+MAINTAINER Mahmoud Zalt <mahmoud@zalt.me>
 
-RUN apt-get update
-RUN apt-get install -y --force-yes php-pear nano
+#
+#--------------------------------------------------------------------------
+# Mandatory Software's Installation
+#--------------------------------------------------------------------------
+#
+# Mandatory Software's such as ("mcrypt", "pdo_mysql", "libssl-dev", ....)
+# are installed on the base image 'laradock/php-fpm' image. If you want
+# to add more Software's or remove existing one, you need to edit the
+# base image (https://github.com/LaraDock/php-fpm).
+#
 
-
-#####################################
-# VHOST:
-#####################################
-ENV TERM xterm
-
-ADD ./sites/*.conf /etc/apache2/sites-available/
-RUN a2dissite 000-default
-RUN a2ensite 000-docker
-RUN a2enmod rewrite
-RUN apache2ctl restart
-
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
-ENV APACHE_PID_FILE /var/run/apache2.pid
-ENV APACHE_RUN_DIR /var/run/apache2
-ENV APACHE_LOCK_DIR /var/lock/apache2
-ENV APACHE_SERVERADMIN developer@localhost
-ENV APACHE_SERVERNAME localhost
-ENV APACHE_SERVERALIAS docker.localhost
-ENV APACHE_DOCUMENTROOT /var/www
-
-ARG PHP_SOCKET=php-fpm:9000
-ENV WEB_PHP_SOCKET=$PHP_SOCKET
-WORKDIR /var/www
-
-#EXPOSE 80 443
-
+#
+#--------------------------------------------------------------------------
+# Optional Software's Installation
+#--------------------------------------------------------------------------
+#
+# Optional Software's will only be installed if you set them to `true`
+# in the `docker-compose.yml` before the build.
+# Example:
+#   - INSTALL_ZIP_ARCHIVE=true
+#
 
 #####################################
 # SOAP:
@@ -69,7 +47,6 @@ RUN if [ ${INSTALL_SOAP} = true ]; then \
     apt-get -y install libxml2-dev php-soap && \
     docker-php-ext-install soap \
 ;fi
-
 
 #####################################
 # xDebug:
@@ -85,7 +62,6 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
 # Copy xdebug configration for remote debugging
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
-
 #####################################
 # PHP REDIS EXTENSION FOR PHP 7
 #####################################
@@ -97,7 +73,6 @@ RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     &&  rm -rf /tmp/pear \
     &&  docker-php-ext-enable redis \
 ;fi
-
 
 #####################################
 # MongoDB:
@@ -117,8 +92,7 @@ RUN if [ ${INSTALL_MONGO} = true ]; then \
 ARG INSTALL_ZIP_ARCHIVE=false
 RUN if [ ${INSTALL_ZIP_ARCHIVE} = true ]; then \
     # Install the zip extension
-    pecl install zip && \
-    docker-php-ext-enable zip \
+    docker-php-ext-install zip \
 ;fi
 
 #####################################
@@ -153,7 +127,6 @@ RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
     && docker-php-ext-enable memcached \
 ;fi
 
-
 #####################################
 # Exif:
 #####################################
@@ -163,7 +136,6 @@ RUN if [ ${INSTALL_EXIF} = true ]; then \
     # Enable Exif PHP extentions requirements
     docker-php-ext-install exif \
 ;fi
-
 
 #####################################
 # PHP Aerospike:
@@ -188,7 +160,6 @@ RUN if [ ${INSTALL_AEROSPIKE_EXTENSION} = true ]; then \
     && docker-php-ext-enable aerospike \
 ;fi
 
-
 #####################################
 # Opcache:
 #####################################
@@ -201,7 +172,6 @@ RUN if [ ${INSTALL_OPCACHE} = true ]; then \
 # Copy opcache configration
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
-
 #####################################
 # Mysqli Modifications:
 #####################################
@@ -211,7 +181,6 @@ RUN if [ ${INSTALL_MYSQLI} = true ]; then \
     docker-php-ext-install mysqli \
 ;fi
 
-
 #####################################
 # Tokenizer Modifications:
 #####################################
@@ -220,7 +189,6 @@ ARG INSTALL_TOKENIZER=false
 RUN if [ ${INSTALL_TOKENIZER} = true ]; then \
     docker-php-ext-install tokenizer \
 ;fi
-
 
 #####################################
 # SQL SERVER:
@@ -302,7 +270,6 @@ RUN if [ ${MSSQL} = true ]; then \
     && locale-gen \
 ;fi
 
-
 #####################################
 # Human Language and Character Encoding Support:
 #####################################
@@ -314,19 +281,6 @@ RUN if [ ${INSTALL_INTL} = true ]; then \
     docker-php-ext-configure intl && \
     docker-php-ext-install intl \
 ;fi
-
-
-#####################################
-# Codeigniter Modifications:
-#####################################
-
-ARG CODEIGNITER=false
-RUN if [ ${CODEIGNITER} = true ]; then \
-    # Install Codeigniter PHP extentions requirements
-     docker-php-ext-install mysqli && \
-     docker-php-ext-install tokenizer \
-;fi
-
 
 #####################################
 # GHOSTSCRIPT:
@@ -342,12 +296,6 @@ RUN if [ ${INSTALL_GHOSTSCRIPT} = true ]; then \
     ghostscript \
 ;fi
 
-#####################################
-# Frameworks:
-#####################################
-
-#RUN composer global require "laravel/installer"
-
 #
 #--------------------------------------------------------------------------
 # Final Touch
@@ -357,8 +305,12 @@ RUN if [ ${INSTALL_GHOSTSCRIPT} = true ]; then \
 ADD ./desarrollo.ini /usr/local/etc/php/conf.d
 ADD ./desarrollo.pool.conf /usr/local/etc/php-fpm.d/
 
-RUN rm -r /var/lib/apt/lists/*
+#RUN rm -r /var/lib/apt/lists/*
 
 RUN usermod -u 1000 www-data
 
 WORKDIR /var/www
+
+CMD ["php-fpm"]
+
+EXPOSE 9000

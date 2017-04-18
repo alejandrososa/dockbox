@@ -16,7 +16,21 @@ services:
             #- ../:/var/www
 
             # Forma C: proyectos al mismo nivel de dockbox
-            - ../proyecto/:/var/www/proyecto
+            - ../:/var/www
+            - ../app-ofertaski/:/var/www/app-ofertaski
+            - ../app-vue/:/var/www/app-vue
+            - ../ofertaski-laravel/:/var/www/ofertaski-laravel
+            - ../plantillas/:/var/www/plantillas
+            - ../demo-ci/:/var/www/demo-ci
+            - ../demo-ci-dev/:/var/www/demo-ci-dev
+            - ../demo-ci-pre/:/var/www/demo-ci-pre
+            - ../leadbrain/:/var/www/leadbrain
+            - ../core/:/var/www/core
+            - ../affiliate/:/var/www/affiliate
+            - ../app-template/:/var/www/app-template
+            - ../landing-viewer/:/var/www/landing-viewer
+            - ../landings/:/var/www/landings
+            - ../landings/iltuoprestito:/var/www/landings/iltuoprestito
 
 
 ###
@@ -27,24 +41,25 @@ services:
             context: ./server
             args:
                 - INSTALL_XDEBUG=true
+                - INSTALL_SOAP=true
                 - INSTALL_MONGO=true
                 - INSTALL_NODE=true
+                - INSTALL_YARN=true
                 - COMPOSER_GLOBAL_INSTALL=true
                 - INSTALL_WORKSPACE_SSH=true
+                - INSTALL_DEPLOYER=false
+                - INSTALL_MC=false
                 - PUID=1000
                 - PGID=1000
-                - INSTALL_DEPLOYER=false
                 - NODE_VERSION=stable
+                - YARN_VERSION=latest
                 - TZ=UTC
-                #- API_TOKEN_COMPOSER=
         volumes_from:
             - aplicaciones
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
             # OBTENER CON: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
             - "dockerhost:172.19.0.2"
-        environment:
-            PHP_IDE_CONFIG: "serverName=Desarrollo"
         ports:
            - "2222:22"
         tty: true
@@ -53,36 +68,114 @@ services:
 ###
 ### PHP 7.0 con APACHE
 ###
-    php:
+#    php:
+#        build:
+#            context: ./php
+#            args:
+#                - INSTALL_XDEBUG=true
+#                - INSTALL_SOAP=true
+#                - INSTALL_MONGO=true
+#                - INSTALL_ZIP_ARCHIVE=true
+#                - INSTALL_BCMATH=true
+#                - INSTALL_PHPREDIS=true
+#                - INSTALL_MEMCACHED=false
+#                - INSTALL_OPCACHE=true
+#                - INSTALL_EXIF=true
+#                - INSTALL_AEROSPIKE_EXTENSION=false
+#                - INSTALL_MYSQLI=true
+#                - INSTALL_TOKENIZER=true
+#                - INSTALL_INTL=true
+#                - INSTALL_GHOSTSCRIPT=true
+#            dockerfile: Dockerfile
+#        volumes_from:
+#            - aplicaciones
+#        volumes:
+#            - ./log/apache2:/var/log/apache2
+#        expose:
+#            - "9000"
+#        depends_on:
+#            - servidor
+#        extra_hosts:
+#            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+#            - "dockerhost:172.18.0.1"
+#            - "app-ofertaski.dev:172.18.0.1"
+#            - "leadbrain.dev:172.18.0.1"
+#            - "affiliate.adgo-tech.dev:172.18.0.1"
+#            - "core.adgo-tech.dev:172.18.0.1"
+#            - "viewer.adgo-tech.dev:172.18.0.1"
+#            - "template.adgo-tech.dev:172.18.0.1"
+#        environment:
+#            - PHP_IDE_CONFIG=PHP_IDE_CONFIG=serverName=desarrollo
+#        ports:
+#          - "80:80"
+#          - "443:443"
+
+
+###
+### PHP 7.0
+###
+    php-fpm:
         build:
-            context: ./php
+            context: ./php-fpm
             args:
-                - INSTALL_XDEBUG=true
-                - INSTALL_SOAP=true
-                - INSTALL_MONGO=true
-                - INSTALL_ZIP_ARCHIVE=true
-                - INSTALL_BCMATH=false
-                - INSTALL_PHPREDIS=true
-                - INSTALL_MEMCACHED=false
-                - INSTALL_OPCACHE=true
-                - INSTALL_AEROSPIKE_EXTENSION=false
-            dockerfile: Dockerfile
+              - INSTALL_XDEBUG=true
+              - INSTALL_SOAP=true
+              - INSTALL_MONGO=false
+              - INSTALL_ZIP_ARCHIVE=true
+              - INSTALL_BCMATH=true
+              - INSTALL_PHPREDIS=true
+              - INSTALL_MEMCACHED=true
+              - INSTALL_OPCACHE=true
+              - INSTALL_EXIF=true
+              - INSTALL_AEROSPIKE_EXTENSION=false
+              - INSTALL_MYSQLI=true
+              - INSTALL_TOKENIZER=true
+              - INSTALL_INTL=true
+              - INSTALL_GHOSTSCRIPT=true
+        volumes_from:
+            - aplicaciones
+        volumes:
+            - ./php-fpm/php70.ini:/usr/local/etc/php/php.ini
+        expose:
+            - "9000"
+        depends_on:
+            - servidor
+        extra_hosts:
+            - "dockerhost:172.18.0.1"
+        environment:
+            - PHP_IDE_CONFIG=PHP_IDE_CONFIG=serverName=desarrollo
+
+
+###
+### PHP Worker
+###
+    php-worker:
+        build:
+            context: ./php-worker
+        volumes_from:
+            - aplicaciones
+        depends_on:
+            - servidor
+
+
+###
+### APACHE
+###
+    apache2:
+        build:
+            context: ./apache2
+            args:
+                - PHP_SOCKET=php-fpm:9000
         volumes_from:
             - aplicaciones
         volumes:
             - ./log/apache2:/var/log/apache2
-        expose:
-            - "9000"
-        links:
-            - servidor
-        extra_hosts:
-            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.19.0.4"
+            - ./apache2/sites:/etc/apache2/sites-available
         ports:
-          - "80:80"
-          - "443:443"
-        links:
-          - mysql
+            - "80:80"
+            - "443:443"
+        depends_on:
+            - php-fpm
 
 ###
 ### MYSQL
@@ -102,7 +195,7 @@ services:
             - "3306:3306"
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.19.0.3"
+            - "dockerhost:172.18.0.1"
 
 
 ###
@@ -121,6 +214,21 @@ services:
             POSTGRES_USER: dev
             POSTGRES_PASSWORD: 123456
 
+
+###
+### MSSQL
+###
+    mssql:
+        build:
+            context: ./mssql
+        environment:
+            - MSSQL_DATABASE=homestead
+            - SA_PASSWORD=123456
+            - ACCEPT_EULA=Y
+        volumes:
+            - ./data//mssql:/var/opt/mssql
+        ports:
+            - "1433:1433"
 
 ###
 ### POSTGRESQL PostGis
@@ -177,11 +285,11 @@ services:
             MYSQL_ROOT_PASSWORD: root
         ports:
             - "8081:80"
-        links:
+        depends_on:
             # for mysql container
-            - "mysql:db"
+            - "mysql"
             # for mariadb container
-            # - "mariadb:db"
+            # - "mariadb"
 
 
 ###
@@ -217,8 +325,6 @@ services:
         ports:
             - "9200:9200"
             - "9300:9300"
-        links:
-            - php
 
 
 ###
@@ -236,7 +342,6 @@ services:
           - ./data/jenkins/docker:/usr/bin/docker
 
 
-
 ###
 ### RABBITMQ
 ###
@@ -250,15 +355,27 @@ services:
         environment:
             RABBITMQ_DEFAULT_USER: guest
             RABBITMQ_DEFAULT_PASS: guest
-        links:
-            - php
 
+
+
+###
+### JIRA
+###
+    jira:
+        build: ./jira
+        volumes:
+            - ./data/jira/jira-webapp:/var/atlassian/jira
+            - ./data/jira/logs:/opt/atlassian/jira/logs
+        ports:
+            - "8087:8080"
 
 
 volumes:
     mysql:
         driver: "local"
     postgres:
+        driver: "local"
+    mssql:
         driver: "local"
     memcached:
         driver: "local"
@@ -277,4 +394,6 @@ volumes:
     sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
         driver: "local"
     jenkins:
+        driver: "local"
+    jira:
         driver: "local"
