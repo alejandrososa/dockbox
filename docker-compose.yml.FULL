@@ -1,0 +1,314 @@
+version: '2'
+
+services:
+
+###
+### APLICACIONES
+###
+
+    aplicaciones:
+        image: tianon/true
+        volumes:
+            # Forma A: directorio dentro de dockbox
+            # - ./web:/var/www
+
+            # Forma B: dockbox dentro de un proyecto
+            #- ../:/var/www
+
+            # Forma C: proyectos al mismo nivel de dockbox
+            - ../proyecto/:/var/www/proyecto
+
+
+###
+### SERVIDOR UBUNTU 16.04
+###
+    servidor:
+        build:
+            context: ./server
+            args:
+                - INSTALL_XDEBUG=true
+                - INSTALL_MONGO=true
+                - INSTALL_NODE=true
+                - COMPOSER_GLOBAL_INSTALL=true
+                - INSTALL_WORKSPACE_SSH=true
+                - PUID=1000
+                - PGID=1000
+                - INSTALL_DEPLOYER=false
+                - NODE_VERSION=stable
+                - TZ=UTC
+                #- API_TOKEN_COMPOSER=
+        volumes_from:
+            - aplicaciones
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            # OBTENER CON: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+            - "dockerhost:172.19.0.2"
+        environment:
+            PHP_IDE_CONFIG: "serverName=Desarrollo"
+        ports:
+           - "2222:22"
+        tty: true
+
+
+###
+### PHP 7.0 con APACHE
+###
+    php:
+        build:
+            context: ./php
+            args:
+                - INSTALL_XDEBUG=true
+                - INSTALL_SOAP=true
+                - INSTALL_MONGO=true
+                - INSTALL_ZIP_ARCHIVE=true
+                - INSTALL_BCMATH=false
+                - INSTALL_PHPREDIS=true
+                - INSTALL_MEMCACHED=false
+                - INSTALL_OPCACHE=true
+                - INSTALL_AEROSPIKE_EXTENSION=false
+            dockerfile: Dockerfile
+        volumes_from:
+            - aplicaciones
+        volumes:
+            - ./log/apache2:/var/log/apache2
+        expose:
+            - "9000"
+        depends_on:
+            - servidor
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            - "dockerhost:172.18.0.7"
+            - "affiliate.adgo-tech.dev:172.21.0.6"
+            - "template.adgo-tech.dev:172.21.0.6"
+        ports:
+          - "80:80"
+          - "443:443"
+        links:
+          - mysql
+        networks:
+            apache:
+                ipv4_address: 172.21.0.6
+                ipv6_address: fe80::42:acff:fe15:6
+#                0:0:0:0:0:ffff:ac15:6
+
+
+
+###
+### MYSQL
+###
+    mysql:
+        build:
+            context: ./mysql
+            args:
+                - MYSQL_DATABASE=demo
+                - MYSQL_USER=dev
+                - MYSQL_PASSWORD=123456
+                - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - mysql:/var/lib/mysql
+            - ./data/mysql:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        extra_hosts:
+            # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
+            - "dockerhost:172.19.0.3"
+
+
+###
+### POSTGRESQL
+###
+    postgres:
+        build: ./postgres
+        volumes:
+            - ./data/postgres/data:/var/lib/postgresql/data
+            - ./data/postgres/backup:/var/lib/postgresql/backup
+            - ./log/postgres:/var/log/postgresql
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: demo
+            POSTGRES_USER: dev
+            POSTGRES_PASSWORD: 123456
+
+
+###
+### POSTGRESQL PostGis
+###
+    postgres-postgis:
+        build: ./postgres-postgis
+        volumes:
+            - ./data/postgis/data:/var/lib/postgresql/data
+        ports:
+            - "5433:5432"
+        environment:
+            POSTGRES_DB: demo
+            POSTGRES_USER: dev
+            POSTGRES_PASSWORD: 123456
+
+
+###
+### MARIADB
+###
+    mariadb:
+        build: ./mariadb
+        volumes:
+            - ./data/mariadb:/var/lib/mysql
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_DATABASE: demo
+            MYSQL_USER: dev
+            MYSQL_PASSWORD: 123456
+            MYSQL_ROOT_PASSWORD: root
+
+
+###
+### MONGODB
+###
+    mongo:
+        build: ./mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - ./data/mongo/db:/data/db
+            - ./data/mongo/configdb:/data/configdb
+
+
+###
+### PHPMYADMIN
+###
+    phpmyadmin:
+        build: ./phpmyadmin
+        environment:
+            PMA_ARBITRARY: 1
+            MYSQL_USER: dev
+            MYSQL_PASSWORD: 123456
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "8081:80"
+        links:
+            # for mysql container
+            - "mysql:db"
+            # for mariadb container
+            # - "mariadb:db"
+
+
+###
+### PGADMIN
+###
+    pgadmin:
+        build: ./pgadmin
+        ports:
+            - "5050:5050"
+        links:
+            - postgres
+
+
+###
+### REDIS
+###
+    redis:
+        build: ./redis
+        volumes:
+            - ./data/redis:/data
+        ports:
+            - "6379:6379"
+
+
+###
+### ELASTICSEARCH
+###
+    elasticsearch:
+        build: ./elasticsearch
+        volumes:
+            - ./data/elasticsearch/data:/usr/share/elasticsearch/data
+            - ./data/elasticsearch/plugins:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        links:
+            - php
+
+
+###
+### JENKINS
+###
+    jenkins:
+        build: ./jenkins
+        ports:
+          - '49001:8080'
+          - '444:8443'
+          - '50000:50000'
+        volumes:
+          - ./data/jenkins/jenkins_home:/var/jenkins_home
+          - ./data/jenkins/docker.sock:/var/run/docker.sock
+          - ./data/jenkins/docker:/usr/bin/docker
+
+
+
+###
+### RABBITMQ
+###
+    rabbitmq:
+        build: ./rabbitmq
+        ports:
+            - "5672:5672"
+            - "15671:15671"
+            - "8082:15672"
+        privileged: true
+        environment:
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+        links:
+            - php
+
+
+networks:
+    apache:
+        # use the bridge driver, but enable IPv6
+        driver: bridge
+        driver_opts:
+            com.docker.network.enable_ipv6: "true"
+            com.docker.network.bridge.enable_ip_masquerade: "false"
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.21.0.0/24
+                  gateway: 172.21.0.1
+                - subnet: "fe80::42:acff:fe15:6/64"
+                  gateway: "fe80::42:acff:fe15:1"
+##        driver: default
+##        driver: bridge
+#        driver_opts:
+#            com.docker.network.enable_ipv6: "true"
+##            com.docker.network.bridge.enable_ip_masquerade: "true"
+#        ipam:
+#            driver: default
+#            config:
+#            - subnet: 172.21.0.0/16
+#              gateway: 172.21.0.1
+
+
+volumes:
+    mysql:
+        driver: "local"
+    postgres:
+        driver: "local"
+    memcached:
+        driver: "local"
+    redis:
+        driver: "local"
+    mariadb:
+        driver: "local"
+    mongo:
+        driver: "local"
+    phpmyadmin:
+        driver: "local"
+    elasticsearch-data:
+        driver: "local"
+    elasticsearch-plugins:
+        driver: "local"
+    sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
+        driver: "local"
+    jenkins:
+        driver: "local"
