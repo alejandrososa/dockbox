@@ -49,8 +49,8 @@ dockerup(){
 
 	#levantar contenedores
 	if [ -z $1 ]; then
-		echo "> Levantando MySql, Postgres, PHP, Servidor"
-		docker-compose up -d mysql php postgres servidor
+		echo "> Levantando MySql, Postgres, PHP, Apache2, Servidor"
+		docker-compose up -d mysql apache2 postgres
 	else
 		echo "> Levantando $($1)"
 		docker-compose up -d $1
