@@ -1,6 +1,6 @@
 FROM redis:latest
 
-MAINTAINER Mahmoud Zalt <mahmoud@zalt.me>
+MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 
 #COPY redis.conf /usr/local/etc/redis/redis.conf
 

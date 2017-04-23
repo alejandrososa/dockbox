@@ -1,6 +1,6 @@
 FROM microsoft/mssql-server-linux
 
-MAINTAINER Mahmoud Zalt <mahmoud@zalt.me>
+MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 
 # Create config directory
 # an set it as WORKDIR

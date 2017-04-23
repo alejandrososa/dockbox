@@ -10,8 +10,13 @@ Contiene las herramientas basicas para que hagas de tus desarrollos lo más como
 ## ¿Qué hay en el entorno ecológico de desarrollo?
 
 * [Ubuntu 16.04](https://www.ubuntu.com/)
+* [Apache 2.4](https://httpd.apache.org/)
+* [NGinx 12](https://www.nginx.com/)
+* [PHP 5.6](http://php.net/manual/es/migration56.new-features.php)
 * [PHP 7.0](http://php.net/manual/es/migration70.new-features.php)
-* [MySql 8.0](http://www.mysql.com/)
+* [PHP 7.1](http://php.net/manual/es/migration71.new-features.php)
+* [MySql 5.7](http://www.mysql.com/)
+* [Mssql 2016](https://www.microsoft.com/en-us/sql-server/sql-server-2016-editions)
 * [MongoDB 3.4](http://www.mongodb.org/)
 * [MariaDb 10.0](https://mariadb.org/)
 * [Postgres 9.6.1](https://www.postgresql.org/)
@@ -21,6 +26,7 @@ Contiene las herramientas basicas para que hagas de tus desarrollos lo más como
 * [PHPMyAdmin 4.6.6](https://www.phpmyadmin.net/)
 * [PGAdmin 4 v1.1](https://www.pgadmin.org/)
 * [Jenkins 2.32](https://jenkins.io)
+* [Jira 7.3.4](https://es.atlassian.com/software/jira)
 
 ## Requerimientos
 
@@ -60,34 +66,11 @@ Configure Docker to start on boot
 
     sudo systemctl enable docker
 
-## Instalación
+## Instalación del Dockbox
 
 Elije la configuración que más se ajuste a tus necesidades.
 
-**A) el programa de instalación a un proyecto concreto:**
-
-(En caso de que quiera un ambiente acoplable para cada proyecto)
-
-A.1) Entorno de instalación en proyecto existente:**
-
-(En caso de que ya tiene un proyecto y desea configurar un entorno para ejecutarlo)
-
-1 - Clonar este repositorio en el directorio raíz del proyecto:
-
-    submódulo git add https://github.com/alejandrososa/dockbox.git
-
-<blockquote>Si no está utilizando Git para su proyecto PHP, se puede utilizar git clone en lugar de git submodule.</blockquote>
-Nota: En este caso la estructura de carpetas será así:
-
-    - /var/www/html/aplicacion1
-        - dockbox
-        
-    - /var/www/html/aplicacion2
-        - dockbox
-        
-A.2) entorno de configuración primero y luego crear el proyecto:
-
-(En caso de que no tenga un proyecto y desea crear su proyecto dentro del entorno docker)
+**Configuración de Proyectos Múltiples::**
 
 1 - clonar este repositorio en cualquier lado de tu máquina:
 
@@ -100,35 +83,16 @@ Nota: En este caso la estructura de carpetas será así:
         - aplicacion1
         - aplicacion2
     
-2 - Editar el `docker-compose.yml` para asignar el directorio del proyecto una vez que lo tenga (ejemplo: `- ../aplicacion1:/var/www`).
-
-3 - Detener y volver a ejecutar el comando `docker-compose para que los cambios tengan efecto.
-
-    docker-compose stop && docker-compose up -d XXXX YYYY ZZZZ ....
-
-**B) Configuración de Proyectos Múltiples:**
-
-1 - clonar este repositorio en cualquier lado de tu máquina:
-
-    git clone https://github.com/alejandrososa/dockbox.git
-
-2 - editar el `docker-compose.yml` para asignar los directorios de proyectos:
-
-    aplicaciones:
-        image: tianon/true
-        volumes:
-            - ../aplicacion1/:/var/www/aplicacion1
-            - ../aplicacion2/:/var/www/aplicacion2
-            
-3 - Se puede acceder a todos los sitios por visitar http://localhost/aplicacion1/public y http://localhost/aplicacion2/public pero por supuesto que no es muy útil por lo que vamos a php configurar rápidamente.
-
-4 - Ir a php/sites y copiar ejemplo.conf a aplicacion1.conf continuación, aplicacion2.conf
-
-5 - Abrir el virtual host `aplicacion1.conf` y editar el `ServerName` y el `DocumentRoot` de la siguiente manera:
-
-    ServerName aplicacion1.dev
-    DocumentRoot /var/www/aplicacion1/public
+2 - Copia el fichero de configuración de ejemplo `.env-example` a `.env` para tener toda la configuración de los contenedores.
     
+    cp .env-example .env
+
+3 - Ejecutar el comando `docker-compose` para que los cambios tengan efecto.
+
+    docker-compose up -d XXXX YYYY ZZZZ ....
+
+4 - Se puede acceder a todos los sitios por visitar http://localhost/aplicacion1/public y http://localhost/aplicacion2/public pero por supuesto que no es muy útil por lo que vamos a php configurar rápidamente.
+
 Haga lo mismo para cada proyecto `aplicacion2.conf`, `aplicacion3.conf`, ...
 
 6 - Añadir los dominios a tu **hosts**.
@@ -137,6 +101,10 @@ Haga lo mismo para cada proyecto `aplicacion2.conf`, `aplicacion3.conf`, ...
     
 7 - Crear las bases de datos del proyecto. En este momento hay que hacerlo de forma manual mediante la introducción de su contenedor DB.
 
+<blockquote>
+Si modificas el fichero docker-compose.yml, .env o cualquier Dockerfile, debes hacer un re-build del conentenedor modificado, para ver cambios efectuados.
+</blockquote>
+
 ## Levantar nuestro entorno
 
 El primer paso antes de levantar nuestro entorno es crear una key de seguridad con ssh-keygen, no te preocupes, lo explico todo en [SSH](docs/SSH.md).
@@ -144,11 +112,11 @@ Ahora que ya tienes tu key-ssh, continúa las indicaciones.
 
 Ir al raíz de nuestro dockbox una vex descargado y ejecutar
 
-    $ docker-compose up -d mysql php servidor
+    $ docker-compose up -d mysql apache2
     
-Puedes combinar según tu necesidad los siguientes contenedores: `servidor`, `mysql`, `php`, `postgres`, `postgres-postgis`, `mariadb`, `mongo`, `phpmyadmin`, `pgadmin`, `redis`, `elasticsearch`
+Puedes combinar según tu necesidad los siguientes contenedores: `apache2`, `nginx`, `mysql`, `mssql`, `postgres`, `postgres-postgis`, `mariadb`, `mongo`, `phpmyadmin`, `pgadmin`, `redis`, `elasticsearch`, `rabbitmq`, `jenkins`, `jira`, `php-worker` 
     
-    $ docker-compose up -d php servidor postgres redis elasticsearch
+    $ docker-compose up -d apache2 postgres redis elasticsearch
     
 ## Contenedores
     
@@ -156,7 +124,8 @@ Ya tenemos nuestro entorno de desarrollo ya está creado y levantado, pero la pr
  
 **Servidor**<br>
 A nivel global en el contenedor encontrarás:
-- Php 7.0
+- Php 5.6, 7.0, 7.1
+- Php cli
 - Composer
 - PhpUnit 5.7
 - Codecept
@@ -170,19 +139,20 @@ A nivel global en el contenedor encontrarás:
 - Sass
 - Webpack
 - TypeScript
+- V8JS
 - XDebug
 - Curl
 - Json
 - Mbstring
 - Sqlite3
 - Vim
+- Yarn
 - Nano
 - Ruby
 - Pear
 
 **PHP**<br>
-- Php 7.0
-- Apache2
+- Php 5.6, 7.0, 7.1
 - XDebug
 - OPCache
 - Soap
@@ -198,16 +168,29 @@ A nivel global en el contenedor encontrarás:
 - PDO Postgres
 - Pgsql
 - Pear
+- Ruby
 
+**PHP Compilers**<br>
+- PHP FPM 
+- HHVM
+
+**PHP Servers**<br>
+- NGINX 
+- Apache2 
+
+**Apche2**<br>
+**NGinx**<br>
 **Mysql**<br>
-- Mysql
-
+**Mongo DB**<br>
+**MARÍA DB**<br>
 **Postgres**<br>
-- Postgresql
-
+**Postgis**<br>
+**MSSql Server**<br>
 **Jenkins**<br>
-- Jenkins 2.32.3
-
+**Jira**<br>
+**ElasticSearch**<br>
+**RabbitMQ**<br>
+**Redis**<br>
 
     
     
@@ -229,11 +212,10 @@ Ver la documentación e imagenes en el directorio docs
 
 Para hacer la vida más sencilla y no tener que entrar al directorio `/var/www/html/dockbox` cada vez que necesites usar los contenedores, he preparado unos alias con los siguientes comandos:
 
-- **dockerup** = levanta el dockbox con los contenedores `mysql php postgres servidor` por defecto.  
-Puedes especificar los contenedores ejecutando `dockerup mysql redis php servidor`
+- **dockerup** = levanta el dockbox con los contenedores `mysql apache2 postgres` por defecto.  
+Puedes especificar los contenedores ejecutando `dockerup mysql redis apache2`
 - **dockerdown** = detiene el dockbox y apaga los contenedores.
 - **dockerrebuild** = actualiza el dockbox con la ultima versíon. Elimina contenedores, bases de datos y configuración de proyectos.
-Se recomienda hacer una copia de `php\Dockerfile`, solo las lineas `a2ensite MI_DOMINIO` para volver a añadir los sites que hemos ido configurando y también `docker-compose.yml`, sólo las lineas donde hemos ido agregando las rutas de los proyectos.
 
 Para agregarlos a tus alias ejecuta los siguientes comandos:
 
@@ -265,6 +247,7 @@ Eliminar contenedores
     docker rm -f $(docker ps -q -a)
 
 ## Log de cambios
+- 23/04/2017 - Se añade el contenedor PHP-FPM, PHP-Worker, NGinx, Mssql, 
 - 13/04/2017 - Se añade el contenedor Jira
 - 15/03/2017 - Se añade el contenedor Rabbitmq
 - 13/03/2017 - Se añade el contenedor Jenkins y documentación

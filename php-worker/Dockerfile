@@ -9,7 +9,7 @@
 
 FROM nielsvdoorn/laravel-supervisor
 
-MAINTAINER Mahmoud Zalt <mahmoud@zalt.me>
+MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 
 #
 #--------------------------------------------------------------------------

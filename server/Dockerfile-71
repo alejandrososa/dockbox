@@ -9,7 +9,7 @@ RUN locale-gen en_US.UTF-8
 
 ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
-ENV LC_CTYPE=UTF-8
+ENV LC_CTYPE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV TERM xterm
 
@@ -31,23 +31,23 @@ RUN apt-get update && \
     apt-get install -y --force-yes \
         sudo \
         php-pear \
-        php7.0-cli \
-        php7.0-common \
-        php7.0-curl \
-        php7.0-json \
-        php7.0-xml \
-        php7.0-mbstring \
-        php7.0-mcrypt \
-        php7.0-mysql \
-        php7.0-pgsql \
-        php7.0-sqlite \
-        php7.0-sqlite3 \
-        php7.0-zip \
-        php7.0-bcmath \
-        php7.0-memcached \
-        php7.0-gd \
-        php7.0-bcmath \
-        php7.0-dev \
+        php7.1-cli \
+        php7.1-common \
+        php7.1-curl \
+        php7.1-json \
+        php7.1-xml \
+        php7.1-mbstring \
+        php7.1-mcrypt \
+        php7.1-mysql \
+        php7.1-pgsql \
+        php7.1-sqlite \
+        php7.1-sqlite3 \
+        php7.1-zip \
+        php7.1-bcmath \
+        php7.1-memcached \
+        php7.1-gd \
+        php7.1-bcmath \
+        php7.1-dev \
         pkg-config \
         libcurl4-openssl-dev \
         libedit-dev \
@@ -80,6 +80,7 @@ RUN apt-get update && \
 
 # Install composer and add its bin to the PATH.
 RUN curl -s http://getcomposer.org/installer | php && \
+    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
     mv composer.phar /usr/local/bin/composer
 
 # Source the bash
@@ -100,23 +101,6 @@ RUN echo "" >> /etc/sudoers  && \
     echo "# User privilege specification" >> /etc/sudoers  && \
     echo "desarrollador   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers  && \
     echo "" >> /etc/sudoers
-
-
-#####################################
-# SOAP:
-#####################################
-USER root
-
-ARG INSTALL_SOAP=false
-ENV INSTALL_SOAP ${INSTALL_SOAP}
-
-RUN if [ ${INSTALL_SOAP} = true ]; then \
-  # Install the PHP SOAP extension
-  apt-get -y update && \
-  add-apt-repository -y ppa:ondrej/php && \
-  apt-get -y install libxml2-dev php7.0-soap \
-;fi
-
 
 #####################################
 # Set Timezone
@@ -185,12 +169,12 @@ ARG INSTALL_XDEBUG=false
 RUN if [ ${INSTALL_XDEBUG} = true ]; then \
     # Load the xdebug extension only with phpunit commands
     apt-get update && \
-    apt-get install -y --force-yes php7.0-xdebug && \
-    sed -i 's/^/;/g' /etc/php/7.0/cli/conf.d/20-xdebug.ini && \
+    apt-get install -y --force-yes php7.1-xdebug && \
+    sed -i 's/^/;/g' /etc/php/7.1/cli/conf.d/20-xdebug.ini && \
     echo "alias phpunit='php -dzend_extension=xdebug.so /var/www/vendor/bin/phpunit'" >> ~/.bashrc \
 ;fi
 # ADD for REMOTE debugging
-COPY ./xdebug.ini /etc/php/7.0/cli/conf.d/xdebug.ini
+COPY ./xdebug.ini /etc/php/7.1/cli/conf.d/xdebug.ini
 
 
 #####################################
@@ -223,7 +207,7 @@ ENV INSTALL_MONGO ${INSTALL_MONGO}
 RUN if [ ${INSTALL_MONGO} = true ]; then \
     # Install the mongodb extension
     pecl install mongodb && \
-    echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/30-mongodb.ini \
+    echo "extension=mongodb.so" >> /etc/php/7.1/cli/conf.d/30-mongodb.ini \
 ;fi
 
 
@@ -247,7 +231,6 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
         nvm use ${NODE_VERSION} && \
         nvm alias ${NODE_VERSION} && \
         npm install -g less && \
-        npm install -g sass && \
         npm install -g webpack && \
         npm install -g typescript && \
         npm install -g vue && \
@@ -303,6 +286,46 @@ RUN if [ ${INSTALL_YARN} = true ]; then \
     echo 'export PATH="$YARN_DIR/bin:$PATH"' >> ~/.bashrc \
 ;fi
 
+#####################################
+# PHP V8JS:
+#####################################
+USER root
+
+ARG INSTALL_V8JS_EXTENSION=false
+ENV INSTALL_V8JS_EXTENSION ${INSTALL_V8JS_EXTENSION}
+
+RUN if [ ${INSTALL_V8JS_EXTENSION} = true ]; then \
+    # Install the php V8JS extension
+    add-apt-repository -y ppa:pinepain/libv8-5.4 \
+    && apt-get update \
+    && apt-get install -y php-dev php-pear libv8-5.4 \
+    && pecl install v8js \
+    && echo "extension=v8js.so" >> /etc/php/7.1/cli/php.ini \
+;fi
+
+#####################################
+# SASS:
+#####################################
+USER desarrollador
+
+ARG INSTALL_SASS=false
+ENV INSTALL_SASS ${INSTALL_SASS}
+
+RUN if [ ${INSTALL_SASS} = true ]; then \
+    # Install the sass bin
+    sudo gem install sass \
+;fi
+
+#####################################
+# Non-root user : PHPUnit path
+#####################################
+
+# add ./vendor/bin to non-root user's bashrc (needed for phpunit)
+USER desarrollador
+
+RUN echo "" >> ~/.bashrc && \
+    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
+
 
 #####################################
 # Deployer:
@@ -316,17 +339,6 @@ RUN if [ ${INSTALL_DEPLOYER} = true ]; then \
     # Install the Deployer
     composer global require "deployer/deployer" \
 ;fi
-
-
-#####################################
-# Non-root user : PHPUnit path
-#####################################
-
-# add ./vendor/bin to non-root user's bashrc (needed for phpunit)
-USER desarrollador
-
-RUN echo "" >> ~/.bashrc && \
-    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
 
 
 #####################################
