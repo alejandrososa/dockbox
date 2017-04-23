@@ -1,6 +1,6 @@
 FROM mariadb:latest
 
-MAINTAINER Mahmoud Zalt <mahmoud@zalt.me>
+MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 
 CMD ["mysqld"]
 

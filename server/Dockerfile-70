@@ -80,6 +80,7 @@ RUN apt-get update && \
 
 # Install composer and add its bin to the PATH.
 RUN curl -s http://getcomposer.org/installer | php && \
+    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
     mv composer.phar /usr/local/bin/composer
 
 # Source the bash
@@ -247,7 +248,6 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
         nvm use ${NODE_VERSION} && \
         nvm alias ${NODE_VERSION} && \
         npm install -g less && \
-        npm install -g sass && \
         npm install -g webpack && \
         npm install -g typescript && \
         npm install -g vue && \
@@ -303,6 +303,46 @@ RUN if [ ${INSTALL_YARN} = true ]; then \
     echo 'export PATH="$YARN_DIR/bin:$PATH"' >> ~/.bashrc \
 ;fi
 
+#####################################
+# PHP V8JS:
+#####################################
+USER root
+
+ARG INSTALL_V8JS_EXTENSION=false
+ENV INSTALL_V8JS_EXTENSION ${INSTALL_V8JS_EXTENSION}
+
+RUN if [ ${INSTALL_V8JS_EXTENSION} = true ]; then \
+    # Install the php V8JS extension
+    add-apt-repository -y ppa:pinepain/libv8-5.4 \
+    && apt-get update \
+    && apt-get install -y php-dev php-pear libv8-5.4 \
+    && pecl install v8js \
+    && echo "extension=v8js.so" >> /etc/php/7.0/cli/php.ini \
+;fi
+
+#####################################
+# SASS:
+#####################################
+USER desarrollador
+
+ARG INSTALL_SASS=false
+ENV INSTALL_SASS ${INSTALL_SASS}
+
+RUN if [ ${INSTALL_SASS} = true ]; then \
+    # Install the sass bin
+    sudo gem install sass \
+;fi
+
+#####################################
+# Non-root user : PHPUnit path
+#####################################
+
+# add ./vendor/bin to non-root user's bashrc (needed for phpunit)
+USER desarrollador
+
+RUN echo "" >> ~/.bashrc && \
+    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
+
 
 #####################################
 # Deployer:
@@ -316,17 +356,6 @@ RUN if [ ${INSTALL_DEPLOYER} = true ]; then \
     # Install the Deployer
     composer global require "deployer/deployer" \
 ;fi
-
-
-#####################################
-# Non-root user : PHPUnit path
-#####################################
-
-# add ./vendor/bin to non-root user's bashrc (needed for phpunit)
-USER desarrollador
-
-RUN echo "" >> ~/.bashrc && \
-    echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
 
 
 #####################################
