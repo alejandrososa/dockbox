@@ -1,5 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
-.idea/
 /.idea/
 /log/*
 /server/ssh/ssh-key
@@ -11,7 +10,10 @@
 /data/mongo/*
 /data/mysql/*
 /data/postgres/*
+/data/postgis/*
 /data/redis/*
+/data/jenkins/*
+/data/jira/*
 !/data/elasticsearch/.gitkeep
 !/data/mariadb/.gitkeep
 !/data/mongo/.gitkeep

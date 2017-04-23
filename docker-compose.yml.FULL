@@ -60,7 +60,7 @@ services:
                 - INSTALL_XDEBUG=true
                 - INSTALL_SOAP=true
                 - INSTALL_MONGO=true
-                - INSTALL_ZIP_ARCHIVE=false
+                - INSTALL_ZIP_ARCHIVE=true
                 - INSTALL_BCMATH=false
                 - INSTALL_PHPREDIS=true
                 - INSTALL_MEMCACHED=false
@@ -73,16 +73,25 @@ services:
             - ./log/apache2:/var/log/apache2
         expose:
             - "9000"
-        links:
+        depends_on:
             - servidor
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.19.0.4"
+            - "dockerhost:172.18.0.7"
+            - "affiliate.adgo-tech.dev:172.21.0.6"
+            - "template.adgo-tech.dev:172.21.0.6"
         ports:
           - "80:80"
           - "443:443"
         links:
           - mysql
+        networks:
+            apache:
+                ipv4_address: 172.21.0.6
+                ipv6_address: fe80::42:acff:fe15:6
+#                0:0:0:0:0:ffff:ac15:6
+
+
 
 ###
 ### MYSQL
@@ -102,7 +111,7 @@ services:
             - "3306:3306"
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:172.18.0.1"
+            - "dockerhost:172.19.0.3"
 
 
 ###
@@ -250,18 +259,34 @@ services:
         environment:
             RABBITMQ_DEFAULT_USER: guest
             RABBITMQ_DEFAULT_PASS: guest
+        links:
+            - php
 
 
-###
-### JIRA
-###
-    jira:
-        build: ./jira
-        volumes:
-            - ./data/jira/jira-webapp:/var/atlassian/jira
-            - ./data/jira/logs:/opt/atlassian/jira/logs
-        ports:
-            - "8087:8080"
+networks:
+    apache:
+        # use the bridge driver, but enable IPv6
+        driver: bridge
+        driver_opts:
+            com.docker.network.enable_ipv6: "true"
+            com.docker.network.bridge.enable_ip_masquerade: "false"
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.21.0.0/24
+                  gateway: 172.21.0.1
+                - subnet: "fe80::42:acff:fe15:6/64"
+                  gateway: "fe80::42:acff:fe15:1"
+##        driver: default
+##        driver: bridge
+#        driver_opts:
+#            com.docker.network.enable_ipv6: "true"
+##            com.docker.network.bridge.enable_ip_masquerade: "true"
+#        ipam:
+#            driver: default
+#            config:
+#            - subnet: 172.21.0.0/16
+#              gateway: 172.21.0.1
 
 
 volumes:
@@ -286,6 +311,4 @@ volumes:
     sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
         driver: "local"
     jenkins:
-        driver: "local"
-    jira:
         driver: "local"
