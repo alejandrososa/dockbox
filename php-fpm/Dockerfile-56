@@ -106,6 +106,16 @@ RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
 ;fi
 
 #####################################
+# Exif:
+#####################################
+
+ARG INSTALL_EXIF=false
+RUN if [ ${INSTALL_EXIF} = true ]; then \
+    # Enable Exif PHP extentions requirements
+    docker-php-ext-install exif \
+;fi
+
+#####################################
 # PHP Aerospike:
 #####################################
 
@@ -141,14 +151,47 @@ RUN if [ ${INSTALL_OPCACHE} = true ]; then \
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 #####################################
-# Codeigniter Modifications:
+# Mysqli Modifications:
 #####################################
 
-ARG CODEIGNITER=false
-RUN if [ ${CODEIGNITER} = true ]; then \
-    # Install Codeigniter PHP extentions requirements
-     docker-php-ext-install mysqli && \
-     docker-php-ext-install tokenizer \
+ARG INSTALL_MYSQLI=false
+# MySQL extenstion is available for Php5.6 and lower only
+COPY ./mysql.ini /usr/local/etc/php/conf.d/mysql.ini
+RUN if [ ${INSTALL_MYSQLI} = true ]; then \
+    docker-php-ext-install mysql && \
+    docker-php-ext-install mysqli \
+;fi
+
+#####################################
+# Tokenizer Modifications:
+#####################################
+
+ARG INSTALL_TOKENIZER=false
+RUN if [ ${INSTALL_TOKENIZER} = true ]; then \
+    docker-php-ext-install tokenizer \
+;fi
+
+#####################################
+# Human Language and Character Encoding Support:
+#####################################
+
+ARG INSTALL_INTL=false
+RUN if [ ${INSTALL_INTL} = true ]; then \
+    # Install intl and requirements
+    apt-get install -y zlib1g-dev libicu-dev g++ && \
+    docker-php-ext-configure intl && \
+    docker-php-ext-install intl \
+;fi
+
+#####################################
+# GHOSTSCRIPT:
+#####################################
+
+ARG INSTALL_GHOSTSCRIPT=false
+RUN if [ ${INSTALL_GHOSTSCRIPT} = true ]; then \
+    # Install the ghostscript extension for PDF editing
+    apt-get update && \
+    apt-get install -y poppler-utils ghostscript \
 ;fi
 
 #
