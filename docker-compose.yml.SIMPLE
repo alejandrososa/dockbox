@@ -250,6 +250,43 @@ services:
 
 
 ###
+### JENKINS
+###
+    jenkins:
+        build: ./jenkins
+        environment:
+            JAVA_OPTS: "-Djava.awt.headless=true"
+        ports:
+          - "${JENKINS_HOST_SLAVE_AGENT_PORT}:50000"
+          - "${JENKINS_HOST_HTTP_PORT}:8080"
+          - "${JENKINS_HOST_HTTPS_PORT}:8443"
+        privileged: true
+        volumes:
+          - ${DATA_SAVE_PATH}/jenkins/jenkins_home:/var/jenkins_home
+          - ${DATA_SAVE_PATH}/jenkins/docker.sock:/var/run/docker.sock
+          - ${DATA_SAVE_PATH}/jenkins/docker:/usr/bin/docker
+
+
+###
+### RABBITMQ
+###
+    rabbitmq:
+        build: ./rabbitmq
+        ports:
+            - "${RABBITMQ_NODE_HOST_PORT}:5672"
+            - "${RABBITMQ_MANAGEMENT_HTTP_HOST_PORT}:15672"
+            - "${RABBITMQ_MANAGEMENT_HTTPS_HOST_PORT}:15671"
+        privileged: true
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+        depends_on:
+            - php-fpm
+        networks:
+            - backend
+
+
+###
 ### NETWORK
 ###
 networks:
@@ -271,4 +308,6 @@ volumes:
     phpmyadmin:
         driver: "local"
     sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
+        driver: "local"
+    jenkins:
         driver: "local"
