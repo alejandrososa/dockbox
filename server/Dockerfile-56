@@ -261,10 +261,8 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
         nvm alias ${NODE_VERSION} && \
         npm install -g less && \
         npm install -g webpack && \
-        npm install -g typescript && \
         npm install -g vue && \
-        npm install -g react react-dom && \
-        npm install -g gulp-cli gulp bower vue-cli \
+        npm install -g react react-dom \
 ;fi
 
 # Wouldn't execute when added to the RUN statement in the above block

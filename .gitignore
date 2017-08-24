@@ -28,3 +28,4 @@
 !/postgres/sql/.gitkeep
 !/postgres/sql/init-demo-db.sh
 /.env
+/docker-compose.yml

@@ -478,10 +478,10 @@ services:
 ### NETWORK
 ###
 networks:
-    frontend:
-        driver: "bridge"
-    backend:
-        driver: "bridge"
+  frontend:
+    driver: "bridge"
+  backend:
+    driver: "bridge"
 
 
 volumes:
