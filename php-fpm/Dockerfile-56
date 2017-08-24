@@ -10,7 +10,7 @@
 #    https://hub.docker.com/r/laradock/php-fpm/tags/
 #
 
-FROM laradock/php-fpm:5.6--1.2
+FROM laradock/php-fpm:1.4-56
 
 MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 
@@ -36,6 +36,12 @@ MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 #   - INSTALL_ZIP_ARCHIVE=true
 #
 
+ENV TERM xterm
+RUN apt-get update && \
+    apt-get install -y --force-yes \
+        nano \
+    && apt-get clean
+
 #####################################
 # SOAP:
 #####################################
@@ -43,8 +49,8 @@ MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
 ARG INSTALL_SOAP=false
 RUN if [ ${INSTALL_SOAP} = true ]; then \
     # Install the soap extension
-    apt-get -y update && \
-    apt-get -y install libxml2-dev && \ 
+    apt-get update -yqq && \
+    apt-get -y install libxml2-dev php-soap && \
     docker-php-ext-install soap \
 ;fi
 
@@ -55,12 +61,38 @@ RUN if [ ${INSTALL_SOAP} = true ]; then \
 ARG INSTALL_XDEBUG=false
 RUN if [ ${INSTALL_XDEBUG} = true ]; then \
     # Install the xdebug extension
-    pecl install xdebug && \
-    docker-php-ext-enable xdebug \
+    # pecl install xdebug && docker-php-ext-enable xdebug \
+    # workaround for https://github.com/docker-library/php/issues/133
+    #     - Xdebug breaks on access to class static property
+    apt-get install -y php5-xdebug && \
+	echo "zend_extension=/usr/lib/php5/20131226/xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 ;fi
 
 # Copy xdebug configration for remote debugging
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+#####################################
+# PHP REDIS EXTENSION FOR PHP 5
+#####################################
+
+ARG INSTALL_PHPREDIS=false
+RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
+    # Install Php Redis Extension
+    pecl install -o -f redis \
+    &&  rm -rf /tmp/pear \
+    &&  docker-php-ext-enable redis \
+;fi
+
+#####################################
+# Swoole EXTENSION FOR PHP 5
+#####################################
+
+ARG INSTALL_SWOOLE=false
+RUN if [ ${INSTALL_SWOOLE} = true ]; then \
+    # Install Php Swoole Extension
+    pecl install swoole \
+    &&  docker-php-ext-enable swoole \
+;fi
 
 #####################################
 # MongoDB:
@@ -101,7 +133,7 @@ RUN if [ ${INSTALL_BCMATH} = true ]; then \
 ARG INSTALL_MEMCACHED=false
 RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
     # Install the php memcached extension
-    pecl install memcached && \
+    pecl install memcached-2.2.0 && \
     docker-php-ext-enable memcached \
 ;fi
 
@@ -143,8 +175,7 @@ RUN if [ ${INSTALL_AEROSPIKE_EXTENSION} = true ]; then \
 
 ARG INSTALL_OPCACHE=false
 RUN if [ ${INSTALL_OPCACHE} = true ]; then \
-    docker-php-ext-install opcache && \
-    docker-php-ext-enable opcache \
+    docker-php-ext-install opcache \
 ;fi
 
 # Copy opcache configration
@@ -194,6 +225,41 @@ RUN if [ ${INSTALL_GHOSTSCRIPT} = true ]; then \
     apt-get install -y poppler-utils ghostscript \
 ;fi
 
+#####################################
+# LDAP:
+#####################################
+
+ARG INSTALL_LDAP=false
+RUN if [ ${INSTALL_LDAP} = true ]; then \
+    apt-get update -yqq && \
+    apt-get install -y libldap2-dev && \
+    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
+    docker-php-ext-install ldap \
+;fi
+
+#####################################
+# SQL SERVER:
+#####################################
+ARG INSTALL_MSSQL=false
+ENV INSTALL_MSSQL ${INSTALL_MSSQL}
+
+RUN if [ ${INSTALL_MSSQL} = true ]; then \
+    apt-get -y install php5-sybase freetds-bin && \
+    cp /usr/lib/php5/20131226/*.so /usr/local/lib/php/extensions/no-debug-non-zts-20131226/ && \
+    docker-php-ext-enable mssql pdo pdo_dblib \
+;fi
+
+#####################################
+# Image optimizers:
+#####################################
+USER root
+ARG INSTALL_IMAGE_OPTIMIZERS=false
+ENV INSTALL_IMAGE_OPTIMIZERS ${INSTALL_IMAGE_OPTIMIZERS}
+RUN if [ ${INSTALL_IMAGE_OPTIMIZERS} = true ]; then \
+    apt-get update -yqq && \
+    apt-get install -y --force-yes jpegoptim optipng pngquant gifsicle \
+;fi
+
 #
 #--------------------------------------------------------------------------
 # Final Touch
@@ -203,7 +269,7 @@ RUN if [ ${INSTALL_GHOSTSCRIPT} = true ]; then \
 ADD ./laravel.ini /usr/local/etc/php/conf.d
 ADD ./laravel.pool.conf /usr/local/etc/php-fpm.d/
 
-RUN rm -r /var/lib/apt/lists/*
+#RUN rm -r /var/lib/apt/lists/*
 
 RUN usermod -u 1000 www-data
 

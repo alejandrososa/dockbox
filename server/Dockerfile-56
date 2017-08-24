@@ -1,8 +1,6 @@
 FROM phusion/baseimage:latest
 
-# Maintainer
 MAINTAINER Alejandro Sosa <alesjohnson@hotmail.com>
-
 
 RUN DEBIAN_FRONTEND=noninteractive
 RUN locale-gen en_US.UTF-8
@@ -95,8 +93,13 @@ RUN . ~/.bashrc
 # Add a non-root user to prevent files being created with root permissions on host machine.
 ARG PUID=1000
 ARG PGID=1000
-RUN groupadd -g $PGID desarrolladores && \
-    useradd -u $PUID -g desarrolladores -m desarrollador
+
+ENV PUID ${PUID}
+ENV PGID ${PGID}
+
+RUN groupadd -g ${PGID} desarrolladores && \
+    useradd -u ${PUID} -g desarrolladores -m desarrollador && \
+    apt-get update -yqq
 
 RUN echo "" >> /etc/sudoers  && \
     echo "# User privilege specification" >> /etc/sudoers  && \
@@ -114,10 +117,9 @@ ENV INSTALL_SOAP ${INSTALL_SOAP}
 
 RUN if [ ${INSTALL_SOAP} = true ]; then \
   # Install the PHP SOAP extension
-  apt-get -y update && \
   add-apt-repository -y ppa:ondrej/php && \
-  apt-get -y install libxml2-dev php5.6-soap && \
-  echo "extension=soap.so" >> /etc/php/5.6/cli/conf.d/40-soap.ini \
+  apt-get update -yqq && \
+  apt-get -y install libxml2-dev php5.6-soap \
 ;fi
 
 
@@ -171,13 +173,17 @@ COPY ./aliases.sh /home/desarrollador/.aliases
 RUN echo "" >> ~/.bashrc
 RUN echo "# Load Custom Aliases" >> ~/.bashrc
 RUN echo "source /home/desarrollador/aliases.sh" >> ~/.bashrc && \
-    echo "" >> ~/.bashrc
+    echo "" >> ~/.bashrc && \
+    sed -i 's/\r//' /home/desarrollador/aliases.sh && \
+    sed -i 's/^#! \/bin\/sh/#! \/bin\/bash/' /home/desarrollador/aliases.sh
 
 USER root
 RUN echo "" >> ~/.bashrc && \
     echo "# Load Custom Aliases" >> ~/.bashrc && \
     echo "source /home/desarrollador/aliases.sh" >> ~/.bashrc && \
-    echo "" >> ~/.bashrc
+    echo "" >> ~/.bashrc && \
+    sed -i 's/\r//' /home/desarrollador/aliases.sh && \
+    sed -i 's/^#! \/bin\/sh/#! \/bin\/bash/' /home/desarrollador/aliases.sh
 
 
 #####################################
@@ -219,7 +225,7 @@ RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
     && service ssh restart \
 ;fi
 
-
+//TODO MONGO
 #####################################
 # MongoDB:
 #####################################
