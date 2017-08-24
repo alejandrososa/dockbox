@@ -23,14 +23,20 @@ services:
                 - INSTALL_XDEBUG=${WORKSPACE_INSTALL_XDEBUG}
                 - INSTALL_SOAP=${WORKSPACE_INSTALL_SOAP}
                 - INSTALL_MONGO=${WORKSPACE_INSTALL_MONGO}
+                - INSTALL_MSSQL=${WORKSPACE_INSTALL_MSSQL}
                 - INSTALL_NODE=${WORKSPACE_INSTALL_NODE}
                 - INSTALL_YARN=${WORKSPACE_INSTALL_YARN}
                 - INSTALL_SASS=${WORKSPACE_INSTALL_SASS}
                 - INSTALL_V8JS_EXTENSION=${WORKSPACE_INSTALL_INSTALL_V8JS_EXTENSION}
                 - COMPOSER_GLOBAL_INSTALL=${WORKSPACE_COMPOSER_GLOBAL_INSTALL}
                 - INSTALL_WORKSPACE_SSH=${WORKSPACE_INSTALL_WORKSPACE_SSH}
+                - INSTALL_LARAVEL_ENVOY=${WORKSPACE_INSTALL_LARAVEL_ENVOY}
+                - INSTALL_LARAVEL_INSTALLER=${WORKSPACE_INSTALL_LARAVEL_INSTALLER}
                 - INSTALL_DEPLOYER=${WORKSPACE_INSTALL_DEPLOYER}
                 - INSTALL_MC=${WORKSPACE_INSTALL_MC}
+                - INSTALL_SYMFONY=${WORKSPACE_INSTALL_SYMFONY}
+                - INSTALL_PYTHON=${WORKSPACE_INSTALL_PYTHON}
+                - INSTALL_IMAGE_OPTIMIZERS=${WORKSPACE_INSTALL_IMAGE_OPTIMIZERS}
                 - PUID=${WORKSPACE_PUID}
                 - PGID=${WORKSPACE_PGID}
                 - NODE_VERSION=${WORKSPACE_NODE_VERSION}
@@ -61,6 +67,7 @@ services:
               - INSTALL_XDEBUG=${PHP_FPM_INSTALL_XDEBUG}
               - INSTALL_SOAP=${PHP_FPM_INSTALL_SOAP}
               - INSTALL_MONGO=${PHP_FPM_INSTALL_MONGO}
+              - INSTALL_MSSQL=${PHP_FPM_INSTALL_MSSQL}
               - INSTALL_ZIP_ARCHIVE=${PHP_FPM_INSTALL_ZIP_ARCHIVE}
               - INSTALL_BCMATH=${PHP_FPM_INSTALL_BCMATH}
               - INSTALL_PHPREDIS=${PHP_FPM_INSTALL_PHPREDIS}
@@ -72,6 +79,9 @@ services:
               - INSTALL_TOKENIZER=${PHP_FPM_INSTALL_TOKENIZER}
               - INSTALL_INTL=${PHP_FPM_INSTALL_INTL}
               - INSTALL_GHOSTSCRIPT=${PHP_FPM_INSTALL_GHOSTSCRIPT}
+              - INSTALL_LDAP=${PHP_FPM_INSTALL_LDAP}
+              - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
+              - INSTALL_IMAGE_OPTIMIZERS=${PHP_FPM_INSTALL_IMAGE_OPTIMIZERS}
         volumes_from:
             - aplicaciones
         volumes:
@@ -95,7 +105,8 @@ services:
         build:
             context: ./nginx
             args:
-                - PHP_UPSTREAM=php-fpm
+                - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
+                - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
         volumes_from:
             - aplicaciones
         volumes:
@@ -118,7 +129,8 @@ services:
         build:
             context: ./apache2
             args:
-                - PHP_SOCKET=${PHP_SOCKET}
+                - PHP_UPSTREAM_CONTAINER=${APACHE_PHP_UPSTREAM_CONTAINER}
+                - PHP_UPSTREAM_PORT=${APACHE_PHP_UPSTREAM_PORT}
         volumes_from:
             - aplicaciones
         volumes:
@@ -140,15 +152,20 @@ services:
     mysql:
         build:
             context: ./mysql
+            args:
+                - MYSQL_VERSION=${MYSQL_VERSION}
         environment:
             - MYSQL_DATABASE=${MYSQL_DATABASE}
             - MYSQL_USER=${MYSQL_USER}
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - TZ=${WORKSPACE_TIMEZONE}
         volumes:
             - ${DATA_SAVE_PATH}/mysql:/var/lib/mysql
+            - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
         ports:
             - "${MYSQL_PORT}:3306"
+        user: "1000:50"
         networks:
             - backend
 
