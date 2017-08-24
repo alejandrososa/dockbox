@@ -12,6 +12,6 @@ services:
 ### Volumes Setup #############################################
 
 volumes:
-  applications-sync:
-    external:
-      name: "applications-docker-sync"
+    applications-sync:
+        external:
+            name: "applications-docker-sync"
