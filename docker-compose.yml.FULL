@@ -462,7 +462,7 @@ services:
 
 
 ###
-### NETWORK
+### SELENIUM
 ###
     selenium:
         build: ./selenium

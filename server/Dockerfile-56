@@ -225,7 +225,6 @@ RUN if [ ${INSTALL_WORKSPACE_SSH} = true ]; then \
     && service ssh restart \
 ;fi
 
-//TODO MONGO
 #####################################
 # MongoDB:
 #####################################
@@ -236,7 +235,8 @@ ENV INSTALL_MONGO ${INSTALL_MONGO}
 RUN if [ ${INSTALL_MONGO} = true ]; then \
     # Install the mongodb extension
     pecl install mongodb && \
-    echo "extension=mongodb.so" >> /etc/php/5.6/cli/conf.d/30-mongodb.ini \
+    echo "extension=mongodb.so" >> /etc/php/5.6/mods-available/mongodb.ini && \
+    ln -s /etc/php/5.6/mods-available/mongodb.ini /etc/php/5.6/cli/conf.d/30-mongodb.ini \
 ;fi
 
 
@@ -356,6 +356,34 @@ RUN echo "" >> ~/.bashrc && \
     echo 'export PATH="/var/www/vendor/bin:$PATH"' >> ~/.bashrc
 
 #####################################
+# Laravel Envoy:
+#####################################
+USER desarrollador
+
+ARG INSTALL_LARAVEL_ENVOY=true
+ENV INSTALL_LARAVEL_ENVOY ${INSTALL_LARAVEL_ENVOY}
+
+RUN if [ ${INSTALL_LARAVEL_ENVOY} = true ]; then \
+    # Install the Laravel Envoy
+    composer global require "laravel/envoy=~1.0" \
+;fi
+
+#####################################
+# Laravel Installer:
+#####################################
+USER root
+
+ARG INSTALL_LARAVEL_INSTALLER=true
+ENV INSTALL_LARAVEL_INSTALLER ${INSTALL_LARAVEL_INSTALLER}
+
+RUN if [ ${INSTALL_LARAVEL_INSTALLER} = true ]; then \
+    # Install the Laravel Installer
+    echo "" >> ~/.bashrc && \
+    echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc \
+    && composer global require "laravel/installer" \
+;fi
+
+#####################################
 # Deployer:
 #####################################
 USER desarrollador
@@ -366,6 +394,17 @@ ENV INSTALL_DEPLOYER ${INSTALL_DEPLOYER}
 RUN if [ ${INSTALL_DEPLOYER} = true ]; then \
     # Install the Deployer
     composer global require "deployer/deployer" \
+;fi
+
+#####################################
+# SQL SERVER:
+#####################################
+ARG INSTALL_MSSQL=false
+ENV INSTALL_MSSQL ${INSTALL_MSSQL}
+
+RUN if [ ${INSTALL_MSSQL} = true ]; then \
+    apt-get -y install php5.6-sybase freetds-bin freetds-common libsybdb5 \
+    && echo "extension=pdo_dblib.so" > /etc/php/5.6/cli/conf.d/20-pdo_dblib.ini \
 ;fi
 
 #####################################
@@ -382,6 +421,18 @@ RUN if [ ${INSTALL_MC} = true ]; then\
     chmod +x /usr/local/bin/mc \
 ;fi
 
+#####################################
+# Image optimizers:
+#####################################
+USER root
+ARG INSTALL_IMAGE_OPTIMIZERS=false
+ENV INSTALL_IMAGE_OPTIMIZERS ${INSTALL_IMAGE_OPTIMIZERS}
+RUN if [ ${INSTALL_IMAGE_OPTIMIZERS} = true ]; then \
+    apt-get install -y --force-yes jpegoptim optipng pngquant gifsicle && \
+    if [ ${INSTALL_NODE} = true ]; then \
+        . ~/.bashrc && npm install -g svgo \
+    ;fi\
+;fi
 
 #####################################
 # Symfony:
@@ -407,6 +458,20 @@ RUN if [ ${INSTALL_SYMFONY} = true ]; then \
 
 
 #RUN source ~/.bashrc
+
+#####################################
+# PYTHON:
+#####################################
+
+ARG INSTALL_PYTHON=false
+ENV INSTALL_PYTHON ${INSTALL_PYTHON}
+RUN if [ ${INSTALL_PYTHON} = true ]; then \
+  apt-get update \
+  && apt-get -y install python python-pip python-dev build-essential  \
+  && pip install --upgrade pip  \
+  && pip install --upgrade virtualenv \
+;fi
+
 
 #
 #--------------------------------------------------------------------------

@@ -30,41 +30,17 @@ Contiene las herramientas basicas para que hagas de tus desarrollos lo más como
 
 ## Requerimientos
 
+* [Git](https://git-scm.com/downloads)
 * [Docker Engine](https://docs.docker.com/installation/)
 * [Docker Compose](https://docs.docker.com/compose/)
 * [Docker Machine](https://docs.docker.com/machine/) (Mac and Windows only)
 
 ## Instalar Docker en Ubuntu
 
-Ver documentación oficial [Docker](https://docs.docker.com/engine/installation/)
+Ver documentación oficial [Docker CE](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/)
 
-Agregar el deb de docker a nuestro listado de software
+Pasos que realice [Docker](docs/Docker.md)
 
-    sudo apt-get update
-    sudo apt-get install apt-transport-https ca-certificates
-    sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-    sudo echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" | sudo tee /etc/apt/sources.list.d/docker.list
-    sudo apt-get update
-
-Instalar docker engine
-    
-    sudo apt-cache policy docker-engine
-    sudo apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual
-    sudo apt-get install docker-engine
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-Dar permisos a usuarios
- 
-    sudo chmod +x /usr/local/bin/docker-compose
-    sudo usermod -aG docker $USER
-
-Iniciar el servicio de docker
-
-    sudo service docker start  {start|stop|restart|status}
-
-Configure Docker to start on boot
-
-    sudo systemctl enable docker
 
 ## Instalación del Dockbox
 
@@ -86,12 +62,34 @@ Nota: En este caso la estructura de carpetas será así:
 2 - Copia el fichero de configuración de ejemplo `.env-example` a `.env` para tener toda la configuración de los contenedores.
     
     cp .env-example .env
+<blockquote>
+Puede editar el archivo .env para elegir el software que desea instalar en su entorno. Puedes configurar las versiones 
+de librerías, cuentas de usuario en bases de datos, instalar librerías, cambiar ip del contenedor, verión de php, etc. 
+Siempre puede consultar el archivo docker-compose.yml para ver cómo se han utilizado esas variables.
+</blockquote>
 
-3 - Ejecutar el comando `docker-compose` para que los cambios tengan efecto.
+3 - Copia el fichero de docker-compose `docker-compose.yml.SIMPLE` a `docker-compose.yml` para tener configurado los 
+contenedores esenciales preconfigurados.
+  
+      cp docker-compose.yml.SIMPLE docker-compose.yml
+  
+  <blockquote>
+  El docker-compose.yml.SIMPLE tiene el mínimo de contenedores para trababar. Si deseas tener todos los contenedores 
+  preconfiguraos entonces copia el docker-compose.yml.FULL
+  </blockquote>
 
-    docker-compose up -d XXXX YYYY ZZZZ ....
-
-4 - Se puede acceder a todos los sitios por visitar http://localhost/aplicacion1/public y http://localhost/aplicacion2/public pero por supuesto que no es muy útil por lo que vamos a php configurar rápidamente.
+4 - Ejecutar el comando `docker-compose` para que los cambios tengan efecto.
+    
+    docker-compose up -d mysql apache2
+        
+  <blockquote>
+<b>Nota</b>: Los contenedores servidor y php-fpm se ejecutarán automáticamente en la mayoría de los casos, por lo que no es 
+necesario especificarlos en el comando up. Si no pudiste encontrarlos corriendo entonces necesitas especificarlos como 
+sigue: docker-compose up -d nginx php-fpm mysql servidor.  
+</blockquote> 
+  
+5 - Se puede acceder a todos los sitios por visitar http://localhost/aplicacion1/public y http://localhost/aplicacion2/public,
+ pero por supuesto que no es muy útil por lo que vamos a php configurar rápidamente.
 
 Haga lo mismo para cada proyecto `aplicacion2.conf`, `aplicacion3.conf`, ...
 
@@ -102,7 +100,8 @@ Haga lo mismo para cada proyecto `aplicacion2.conf`, `aplicacion3.conf`, ...
 7 - Crear las bases de datos del proyecto. En este momento hay que hacerlo de forma manual mediante la introducción de su contenedor DB.
 
 <blockquote>
-Si modificas el fichero docker-compose.yml, .env o cualquier Dockerfile, debes hacer un re-build del conentenedor modificado, para ver cambios efectuados.
+Si modificas el fichero docker-compose.yml, .env o cualquier Dockerfile, debes hacer un re-build del conentenedor 
+modificado, para ver cambios efectuados.
 </blockquote>
 
 ## Levantar nuestro entorno
@@ -114,9 +113,30 @@ Ir al raíz de nuestro dockbox una vex descargado y ejecutar
 
     $ docker-compose up -d mysql apache2
     
-Puedes combinar según tu necesidad los siguientes contenedores: `apache2`, `nginx`, `mysql`, `mssql`, `postgres`, `postgres-postgis`, `mariadb`, `mongo`, `phpmyadmin`, `pgadmin`, `redis`, `elasticsearch`, `rabbitmq`, `jenkins`, `jira`, `php-worker` 
+Puedes combinar según tu necesidad los siguientes contenedores: `apache2`, `nginx`, `mysql`, `mssql`, `postgres`, 
+`postgres-postgis`, `mariadb`, `mongo`, `phpmyadmin`, `pgadmin`, `redis`, `elasticsearch`, `rabbitmq`, `jenkins`, 
+`jira`, `php-worker`, `beanstalkd`, `beanstalkd-console`, `kibana`
     
     $ docker-compose up -d apache2 postgres redis elasticsearch
+
+Ingresa el contenedor `servidor`, para ejecutar comandos como (Symfony, Node, Composer, PHPUnit, Gulp, ...)
+
+    docker-compose exec servidor bash
+
+o
+
+    ssh root@127.0.0.1 -p 2222
+
+<blockquote>
+<b>Nota:</b> Puedes agregar --user=desarrollador para que los archivos se creen como el usuario del host. 
+</blockquote>
+
+Ejemplo:
+
+    docker-compose exec --user=desarrollador servidor bash
+
+Puede cambiar las variables PUID (identificador de usuario) y PGID (identificador de grupo) desde el archivo .env)    
+    
     
 ## Contenedores
     
@@ -189,8 +209,12 @@ A nivel global en el contenedor encontrarás:
 **Jenkins**<br>
 **Jira**<br>
 **ElasticSearch**<br>
+**Kibana**<br>
 **RabbitMQ**<br>
 **Redis**<br>
+**Memcached**<br>
+**Beanstalkd**<br>
+**Selenium**<br>
 
     
     
@@ -219,9 +243,23 @@ Puedes especificar los contenedores ejecutando `dockerup mysql redis apache2`
 
 Para agregarlos a tus alias ejecuta los siguientes comandos:
 
+**Linux**    
+
     cd /var/www/html/dockbox
-    cat docker.sh >> ~/.bash_aliases  && source ~/.bash_aliases         Linux
-    cat docker-mac.sh >> ~/.bash_profile && source ~/.bash_profile      Mac
+    touch ~/.aliases_personales && cat server/aliases.sh >> ~/.aliases_personales  && source ~/.aliases_personales 
+    touch ~/.aliases_docker && cat docker.sh >> ~/.aliases_docker  && source ~/.aliases_docker  
+    echo "source ~/.aliases_personales" >> ~/.bash_aliases        
+    echo "source ~/.aliases_docker" >> ~/.bash_aliases        
+    source ~/.bash_aliases 
+    
+**Mac**
+    
+    cd /var/www/html/dockbox
+    touch ~/.aliases_personales && cat server/aliases.sh >> ~/.aliases_personales  && source ~/.aliases_personales 
+    touch ~/.aliases_docker && cat docker-mac.sh >> ~/.aliases_docker  && source ~/.aliases_docker  
+    echo "source ~/.aliases_personales" >> ~/.bash_profile        
+    echo "source ~/.aliases_docker" >> ~/.bash_profile  
+    source ~/.bash_profile 
     
 
 ## Comandos utiles de docker
@@ -247,6 +285,7 @@ Eliminar contenedores
     docker rm -f $(docker ps -q -a)
 
 ## Log de cambios
+- 24/08/2017 - Se añade el contenedor Selenium, Beanstalkd, Mencached, Kibana. Actualización de documentación, 
 - 23/04/2017 - Se añade el contenedor PHP-FPM, PHP-Worker, NGinx, Mssql, 
 - 13/04/2017 - Se añade el contenedor Jira
 - 15/03/2017 - Se añade el contenedor Rabbitmq
