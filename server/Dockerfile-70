@@ -394,6 +394,7 @@ RUN if [ ${INSTALL_DEPLOYER} = true ]; then \
 #####################################
 # SQL SERVER:
 #####################################
+USER root
 ARG INSTALL_MSSQL=true
 ENV INSTALL_MSSQL ${INSTALL_MSSQL}
 
