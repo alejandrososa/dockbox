@@ -264,27 +264,43 @@ Para agregarlos a tus alias ejecuta los siguientes comandos:
 
 ## Comandos utiles de docker
 
-Listar contenedores levantados
+**`dc`** es el alias docker-compose, si realizaste el paso de añadir los alias, entonces puedes ahorrar unos cuantos caracteres. :D
+
+**Docker Compose**<br>
+
+|Comando | Descripción  |
+|---|---|
+| dc ps  | Listar contenedores levantados  |
+| dc stop $(docker ps -q -a) | Detener todos los contenedores activod  |
+| dc rmi -f $(docker images -q)  | Eliminar imagenes   |
+| dc rm -f $(docker ps -q -a)  | Eliminar contenedores  |
+|   |   |
+
+
+**Docker**
+|Comando | Descripción  |
+|---|---|
+| docker ps  | Listar contenedores levantados  |
+| docker ps -a  | Listar contenedores inactivos  |
+| docker stop $(docker ps -q -a) | Detener todos los contenedores activod  |
+| docker rmi -f $(docker images -q)  | Eliminar imagenes   |
+| docker rm -f $(docker ps -q -a)  | Eliminar contenedores  |
+
+
+
     
-    docker ps
 
-Listar contenedores inactivos
 
-    docker ps -a
     
-Detener todos los contenedores activod
 
-    docker stop $(docker ps -q -a)
 
-Eliminar imagenes 
 
-    docker rmi -f $(docker images -q)
-
-Eliminar contenedores
-
-    docker rm -f $(docker ps -q -a)
+    
 
 ## Log de cambios
+
+Soluciones a errores comunes [SOLUCIÓN DE ERRORES](docs/ErroresComunes.md)
+
 - 24/08/2017 - Se añade el contenedor Selenium, Beanstalkd, Mencached, Kibana. Actualización de documentación, 
 - 23/04/2017 - Se añade el contenedor PHP-FPM, PHP-Worker, NGinx, Mssql, 
 - 13/04/2017 - Se añade el contenedor Jira
