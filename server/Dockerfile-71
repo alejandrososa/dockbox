@@ -504,7 +504,7 @@ RUN if [ ${INSTALL_ZMQ} = true ]; then \
     apt-get update -yqq && \
     apt-get install -y build-essential libtool autoconf pkg-config libsodium-dev libzmq-dev && \
     pecl install -o -f zmq-beta &&  rm -rf /tmp/pear \
-    #docker-php-ext-enable zmq \
+    docker-php-ext-enable zmq \
 ;fi
 #####################################
 # Symfony:
