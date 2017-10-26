@@ -301,11 +301,12 @@ Para agregarlos a tus alias ejecuta los siguientes comandos:
 
 Soluciones a errores comunes [SOLUCIÓN DE ERRORES](docs/ErroresComunes.md)
 
-- 24/08/2017 - Se añade el contenedor Selenium, Beanstalkd, Mencached, Kibana. Actualización de documentación, 
-- 23/04/2017 - Se añade el contenedor PHP-FPM, PHP-Worker, NGinx, Mssql, 
-- 13/04/2017 - Se añade el contenedor Jira
-- 15/03/2017 - Se añade el contenedor Rabbitmq
-- 13/03/2017 - Se añade el contenedor Jenkins y documentación
+- 26/10/2017 - Se añade la extensión ZeroMQ a los contenedores Servidor, PHP-FPM. 
+- 24/08/2017 - Se añade el contenedor Selenium, Beanstalkd, Mencached, Kibana. Actualización de documentación. 
+- 23/04/2017 - Se añade el contenedor PHP-FPM, PHP-Worker, NGinx, Mssql.
+- 13/04/2017 - Se añade el contenedor Jira.
+- 15/03/2017 - Se añade el contenedor Rabbitmq.
+- 13/03/2017 - Se añade el contenedor Jenkins y documentación.
 - 19/02/2017 - Configuración y documentación para realizar backup de Mysql y Postgresql.
 - 19/02/2017 - Corrección de persistencia de datos en postgres.
 - 11/02/2017 - Corrección de permisos de usuario desarrollador en el contenedor servidor.
