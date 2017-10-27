@@ -503,8 +503,8 @@ RUN if [ ${INSTALL_ZMQ} = true ]; then \
     # Install intl and requirements
     apt-get update -yqq && \
     apt-get install -y build-essential libtool autoconf pkg-config libsodium-dev libzmq-dev && \
-    pecl install -o -f zmq-beta &&  rm -rf /tmp/pear \
-    docker-php-ext-enable zmq \
+    pecl install -o -f zmq-beta &&  rm -rf /tmp/pear && \
+    echo "extension=zmq.so" > /etc/php/7.0/cli/conf.d/zmq.ini \
 ;fi
 #####################################
 # Symfony:
